@@ -456,6 +456,53 @@ User.prototype.getStatistics = function (next) {
   });
 };
 
+User.prototype.getUserStat = function () {
+  const getDayStatis = (jour, thematique) => new Promise((resolve) => {
+    Reponse.findAll({
+      include: [{
+        model: Remplissage,
+        where: { date: jour, user_id: this.id },
+      },
+      { 
+        model: Question,
+        where: { thematique_id: thematique }, 
+      },
+      ],
+    }).then((reps) => {
+      if (reps.length > 0) {
+        let satisfaction = 0;
+        reps.forEach((rep) => {
+          satisfaction += rep.dataValues.valeur;
+        });
+        resolve(parseFloat((satisfaction / reps.length).toFixed(3)));
+      } else {
+        resolve(0);
+      }
+    });
+  });
+
+  return new Promise((resolve) => {
+    const reponse = [];
+    Thematique.findAll().then((thematiques) => {
+      thematiques.forEach((thematique) => {
+        const themPromise = new Promise((resolveThem) => {
+          const intPromises = [];
+          for (let i = 0; i < 31; i++) {
+            intPromises.push(getDayStatis(Date.now() - (86400000 * i), thematique.dataValues.id));
+          }
+          Promise.all(intPromises).then((data) => {
+            resolveThem({ [thematique.dataValues.name]: data });
+          });
+        });
+        reponse.push(themPromise);
+      });
+      Promise.all(reponse).then((data) => {
+        resolve(data);
+      }); 
+    });
+  }); 
+};
+
 User.prototype.findSondage = function (req) {
   return new Promise((resolve) => {
     const { sondage_id, remplissage_id } = req.user;

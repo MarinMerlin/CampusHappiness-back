@@ -64,5 +64,13 @@ router.get('/getToken', (req, res) => {
       });
   });
 });
+
+router.get('/userStat', (req, res) => {
+  Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
+    user.getUserStat().then((data) => {
+      res.status(200).send(data);
+    });
+  });
+});
  
 module.exports = router;
