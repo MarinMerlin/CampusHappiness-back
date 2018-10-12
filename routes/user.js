@@ -56,11 +56,19 @@ router.post('/updatePhoto', (req, res) => {
 
 router.get('/getToken', (req, res) => {
   Models.Sondage.findOne({ where: { current: true } }).then((sondage) => {
-    Models.User.findOne({ where: { id: req.user.id } })
-      .then((user) => {
-        const sondage_id = sondage.dataValues.id;
-        const token = user.generateJwt(sondage_id);
-        res.status(200).send({ token: token });
+    Models.Remplissage.findOne({ where: { user_id: req.user.id, date: Date.now(), sondage_id: sondage.dataValues.id } })
+      .then((remplissage) => {
+        Models.User.findOne({ where: { id: req.user.id } })
+          .then((user) => {
+            const sondage_id = sondage.dataValues.id;
+            let token;
+            if (remplissage) {
+              token = user.generateJwt(sondage_id, remplissage.dataValues.id);
+            } else {
+              token = user.generateJwt(sondage_id);
+            }
+            res.status(200).send({ token: token });
+          });
       });
   });
 });

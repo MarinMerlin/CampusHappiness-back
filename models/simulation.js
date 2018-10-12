@@ -45,12 +45,12 @@ const fakeSurvey = {
           keyWord: 'Bruit',
         },
         {
-          text: 'th1 question4',
-          keyWord: 'q4',
+          text: 'Le prix convenait il?',
+          keyWord: 'Prix',
         },
         {
-          text: 'th1 question5',
-          keyWord: 'q5',
+          text: "Propreté des lieux",
+          keyWord: 'Propreté',
         },
       ],
     },
@@ -74,29 +74,29 @@ const fakeSurvey = {
           keyWord: 'Propreté',
         },
         {
-          text: 'th2 question3',
-          keyWord: 'q3',
+          text: 'Ambiance',
+          keyWord: 'Ambiance',
         },
         {
-          text: 'th2 question4',
-          keyWord: 'q4',
+          text: 'Le materielle',
+          keyWord: 'Materielle',
         },
       ],
     },
     {
-      name: 'thematique 3',
+      name: 'Espace de repos',
       questionList: [
         {
-          text: 'th3 question1',
-          keyWord: 'q1',
+          text: 'Le lieux était il propre',
+          keyWord: 'Propreté',
         },
         {
-          text: 'th3 question2',
-          keyWord: 'q2',
+          text: "L'ambiance était elle convenable?",
+          keyWord: 'Ambiance',
         },
         {
-          text: 'th3 question3',
-          keyWord: 'q3',
+          text: 'Temperature convenable?',
+          keyWord: 'Temperature',
         },
       ],
     },
@@ -112,7 +112,7 @@ const addManyUsers = function (userNumber) {
     if (userNumber > 0) {
       const promiseArray = [];
       for (let i = 0; i < userNumber; i++) {
-        promiseArray.push(User.addUser('prenom', 'nom', 'goulven.molaret@supekec.fr', 'foutre', 'mdp', 0));
+        promiseArray.push(User.addUser('User', 'User', 'user.user@gmail.fr', 'User', 'mdp', 0));
       }
       Promise.all(promiseArray).then(resolve);
     } else {
@@ -186,9 +186,9 @@ const answerAll = function () {
 
 const firstDay = function () {
   return new Promise(function (resolve) {
-    User.addUser('marin', 'merlin', 'marin.merlin@me.com', 'mokoloco', 'mdp', 1).then(() => {
+    User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(() => {
       addManyUsers(10).then(() => {
-        User.findOne({ where: { pseudo: 'mokoloco' } }).then((user) => {
+        User.findOne({ where: { pseudo: 'Admin' } }).then((user) => {
           user.createSondage(fakeSurvey).then((sondage_id) => {
             Sondage.update({ current: true }, { where: { id: sondage_id } });
             getQuestionIdList(sondage_id).then(() => {
