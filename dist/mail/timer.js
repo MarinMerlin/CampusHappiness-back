@@ -25,7 +25,6 @@ var scheduler = function scheduler() {
           nombre_emission: 0
         }
       }).spread(function (jourSondage, created) {
-        console.log("Is this the first Sondage sent today: ", created);
         Models.User.findAll().then(function (users) {
           users.forEach(function (data) {
             var sondage_id = sondage.dataValues.id;
@@ -33,7 +32,6 @@ var scheduler = function scheduler() {
             var diff = Date.now() - data.dataValues.lastMailDate;
 
             if (data.dataValues.mailIntensity < diff / (1000 * 60 * 60 * 24) + 0.4) {
-              console.log("Sending mail to: ".concat(data.dataValues.lastName));
               mailer(data.dataValues, token);
               Models.User.update({
                 lastMailDate: Date.now()
