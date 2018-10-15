@@ -53,12 +53,6 @@ router.post('/updatePhoto', function (req, res) {
           id: req.user.id
         }
       }).then(function () {
-        var newCookie = Object.assign(req.user, {
-          photo: "/user/photo/".concat(req.user.pseudo)
-        });
-        req.login(newCookie, function (err) {
-          console.log("Modified cookie: ", newCookie);
-        });
         res.status(200).json({
           photo: "/user/photo/".concat(req.user.pseudo)
         });
@@ -82,6 +76,18 @@ router.get('/getToken', function (req, res) {
       res.status(200).send({
         token: token
       });
+    });
+  });
+});
+router.get('/userStat', function (req, res) {
+  Models.User.findOne({
+    where: {
+      id: req.user.id
+    }
+  }).then(function (user) {
+    user.getUserStat().then(function (data) {
+      console.log("PLOPPPPPP   ", data);
+      res.status(200).send(data);
     });
   });
 });

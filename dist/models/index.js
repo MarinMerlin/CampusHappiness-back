@@ -557,6 +557,110 @@ User.prototype.getStatistics = function (next) {
   });
 };
 
+User.prototype.getUserStat = function () {
+  var _this2 = this;
+
+  var getDayStatis = function getDayStatis(jour, thematique) {
+    return new Promise(function (resolve) {
+      Reponse.findAll({
+        include: [{
+          model: Remplissage,
+          where: {
+            date: jour,
+            user_id: _this2.id
+          }
+        }, {
+          model: Question,
+          where: {
+            thematique_id: thematique
+          }
+        }]
+      }).then(function (reps) {
+        if (reps.length > 0) {
+          var satisfaction = 0;
+          reps.forEach(function (rep) {
+            satisfaction += rep.dataValues.valeur;
+          });
+          resolve(parseFloat((satisfaction / reps.length).toFixed(3)));
+        } else {
+          resolve(0);
+        }
+      });
+    });
+  };
+
+  return new Promise(function (resolve) {
+    var reponse = [];
+    Thematique.findAll().then(function (thematiques) {
+      thematiques.forEach(function (thematique) {
+        var themPromise = new Promise(function (resolveThem) {
+          var intPromises = [];
+
+          for (var i = 0; i < 31; i++) {
+            intPromises.push(getDayStatis(Date.now() - 86400000 * i, thematique.dataValues.id));
+          }
+
+          Promise.all(intPromises).then(function (data) {
+            resolveThem(_defineProperty({}, thematique.dataValues.name, data));
+          });
+        });
+        reponse.push(themPromise);
+        /* reponse[thematique.dataValues.name] = [];
+        for (let i = 0; i < 31; i++) {
+          reponse[thematique.dataValues.name].push(getDayStatis(Date.now() - (86400000 * i), thematique.dataValues.id));
+        }
+        Promise.all(reponse[thematique.dataValues.name]).then( data => {
+         }); */
+      });
+      Promise.all(reponse).then(function (data) {
+        resolve(data);
+      });
+    });
+  });
+  /* Reponse.findAll({
+      include: [{
+        model: Remplissage,
+        where: { user_id: this.id },
+      }],
+    }).then((reps) => {
+      const listRep = {};
+      const promises = [];
+      reps.forEach((rep) => {
+        const promise = Question.findOne({
+          where: { id: rep.dataValues.question_id },
+          include: [{
+            model: Thematique,
+          }],
+        });
+        promises.push(promise);
+        promise.then((them) => {
+          const themName = them.dataValues.thematique.dataValues.name;
+          console.log(listRep[themName]);
+          if (listRep[themName]) {
+            listRep[themName].push({ 
+              value: rep.dataValues.valeur, 
+              date: rep.dataValues.remplissage.dataValues.date,
+            });
+          } else {
+            listRep[themName] = [{ 
+              value: rep.dataValues.valeur, 
+              date: rep.dataValues.remplissage.dataValues.date, 
+            }];
+          }
+        });
+      });
+      Promise.all(promises).then(() => {
+        const listRep2 = [];
+        listRep.forEach((thematique) => {
+          console.log(thematique.index);
+          // listRep2.push({thematique: })
+        });
+        resolve(listRep);
+      });
+    });
+  }); */
+};
+
 User.prototype.findSondage = function (req) {
   return new Promise(function (resolve) {
     var _req$user = req.user,
@@ -668,13 +772,13 @@ User.prototype.findSondage = function (req) {
 
 
 User.prototype.answerSondage = function (sondage, simulationDate) {
-  var _this2 = this;
+  var _this3 = this;
 
   var date = simulationDate || Date.now();
   return new Promise(function (resolve) {
     var remplissage_id = sondage.remplissage_id;
     var sondage_id = sondage.sondage_id;
-    Remplissage.addRemplissage(remplissage_id, sondage_id, _this2.id, date).then(function () {
+    Remplissage.addRemplissage(remplissage_id, sondage_id, _this3.id, date).then(function () {
       var promises = [];
       sondage.answered_questions.forEach(function (question_answer) {
         promises.push(Reponse.addReponse(remplissage_id, question_answer.question_id, question_answer.answer));
