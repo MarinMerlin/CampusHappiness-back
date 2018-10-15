@@ -104,9 +104,8 @@ router.get('/getSondage', (req, res) => {
 */
 router.post('/postSondage', (req, res) => {
   Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
-    user.createSondage(req.body).then(() => {
-      console.log("New sondage created: ", req.body.name);
-      res.status(200).send("New sondage created");
+    user.createSondage(req.body).then((sondageId) => {
+      res.json({ sondageId: sondageId });
     });
   });
 });
