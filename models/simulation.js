@@ -49,8 +49,12 @@ const fakeSurvey = {
           keyWord: 'Prix',
         },
         {
-          text: "Propreté des lieux",
+          text: "Propreté de la cafeteria",
           keyWord: 'Propreté',
+        },
+        {
+          text: "Propreté des sanitaires",
+          keyWord: 'propreté',
         },
       ],
     },
