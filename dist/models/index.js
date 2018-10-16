@@ -33,7 +33,9 @@ var sondageConstructor = require('./constructor/sondage');
 
 var thematiqueConstructor = require('./constructor/thematique');
 
-var commentaireConstructor = require('./constructor/commentaire'); // sequelize connection
+var commentaireConstructor = require('./constructor/commentaire');
+
+var keywordConstructor = require('./constructor/keyword'); // sequelize connection
 
 
 var sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -56,7 +58,8 @@ var Remplissage = remplissageConstructor(sequelize);
 var Reponse = reponseConstructor(sequelize);
 var Sondage = sondageConstructor(sequelize);
 var Thematique = thematiqueConstructor(sequelize);
-var Commentaire = commentaireConstructor(sequelize); // // Foreign keys
+var Commentaire = commentaireConstructor(sequelize);
+var Keyword = keywordConstructor(sequelize); // // Foreign keys
 
 Question.belongsTo(Sondage, {
   foreignKey: 'sondage_id',
@@ -232,6 +235,7 @@ User.prototype.getStatisticsSpecific = function (date) {
         resolveAll("no sondage this day...");
       } else {
         var sondage_id = jourSondage.dataValues.sondage_id;
+        console.log(sondage_id);
         var questionList = [];
         var thematiqueIdList = [];
         var remplissageIdList = [];
@@ -293,20 +297,25 @@ User.prototype.getStatisticsSpecific = function (date) {
             });
           }));
           promises.push(new Promise(function (resolve) {
-            Reponse.findAll({
-              where: {
-                remplissage_id: _defineProperty({}, Op.or, remplissageIdList)
-              }
-            }).then(function (reponses) {
-              reponses.forEach(function (reponse) {
-                reponseList.push(reponse.dataValues);
+            if (remplissageIdList.length > 0) {
+              Reponse.findAll({
+                where: {
+                  remplissage_id: _defineProperty({}, Op.or, remplissageIdList)
+                }
+              }).then(function (reponses) {
+                reponses.forEach(function (reponse) {
+                  reponseList.push(reponse.dataValues);
+                });
+                resolve();
               });
+            } else {
               resolve();
-            });
+            }
           }));
           Promise.all(promises).then(function () {
-            // thematiqueId --> { thematiqueName, questionMap }
+            console.log(questionList); // thematiqueId --> { thematiqueName, questionMap }
             // questionMap: questionId --> { keyWord, sum, numberAnswer } 
+
             var sondageMap = new Map(); // thematiqueId -->  name 
 
             var thematiqueMap = new Map();
@@ -784,7 +793,8 @@ var Models = {
   Question: Question,
   Reponse: Reponse,
   Thematique: Thematique,
-  Commentaire: Commentaire
+  Commentaire: Commentaire,
+  Keyword: Keyword
 };
 module.exports = Models;
 //# sourceMappingURL=index.js.map

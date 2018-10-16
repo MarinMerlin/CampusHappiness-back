@@ -157,5 +157,26 @@ router.get("/specificStatistics/:year/:month/:day", function (req, res) {
     });
   });
 });
+router.get("/getKeywords", function (req, res) {
+  Models.Keyword.findAll().then(function (keywords) {
+    var keywordList = [];
+    keywords.forEach(function (keyword) {
+      keywordList.push(keyword.dataValues.name);
+    });
+    res.status(200).json(keywordList);
+  });
+});
+router.post("/addKeyWord", function (req, res) {
+  console.log(req.body);
+  Models.Keyword.addKeyword(req.body.name).then(function () {
+    Models.Keyword.findAll().then(function (keywords) {
+      var keywordList = [];
+      keywords.forEach(function (keyword) {
+        keywordList.push(keyword.dataValues.name);
+      });
+      res.status(200).json(keywordList);
+    });
+  });
+});
 module.exports = router;
 //# sourceMappingURL=admin.js.map

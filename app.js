@@ -33,7 +33,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(env.session_secret_key));
 app.use(session({
   genid: (req) => {
-    console.log('Inside the session middleware');
     console.log(req.sessionID);
     return id_generator(); // use UUIDs for session IDs
   },

@@ -3,7 +3,7 @@ const id_generator = require('../custom_module/id_generator');
 const clearTables = require('./setup');
 
 const { 
-  Sondage, User, Reponse, Question, Remplissage, JourSondage,
+  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword,
 } = Models;
 
 const simulationTime = 35;
@@ -195,6 +195,7 @@ const firstDay = function () {
         User.findOne({ where: { pseudo: 'Admin' } }).then((user) => {
           user.createSondage(fakeSurvey).then((sondage_id) => {
             Sondage.update({ current: true }, { where: { id: sondage_id } });
+            Keyword.addKeyword("Qualité");
             getQuestionIdList(sondage_id).then(() => {
               answerAll().then(() => { 
                 incrementDay();

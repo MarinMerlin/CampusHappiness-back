@@ -39,8 +39,7 @@ router.post('/updateUser', (req, res) => {
 
 router.post('/updatePhoto', (req, res) => {
   const base64Data = req.body.photo.replace(/^data:image\/jpeg;base64,/, "");
-  console.log(base64Data);
-  fs.writeFile(`./public/user/photo/${req.user.pseudo}`, base64Data, 'base64', (err) => {
+  fs.writeFile(`./public/user/photo/${req.user.pseudo}.jpg`, base64Data, 'base64', (err) => {
     if (err) { 
       console.log(err);
     } else {

@@ -11,7 +11,8 @@ var Sondage = Models.Sondage,
     Reponse = Models.Reponse,
     Question = Models.Question,
     Remplissage = Models.Remplissage,
-    JourSondage = Models.JourSondage;
+    JourSondage = Models.JourSondage,
+    Keyword = Models.Keyword;
 var simulationTime = 35;
 var simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
@@ -204,6 +205,7 @@ var firstDay = function firstDay() {
                 id: sondage_id
               }
             });
+            Keyword.addKeyword("Qualité");
             getQuestionIdList(sondage_id).then(function () {
               answerAll().then(function () {
                 incrementDay();
