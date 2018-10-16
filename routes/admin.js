@@ -70,6 +70,24 @@ router.post('/postUsers',
     Promise.all(promises).then(res.status(200).json({ success: true }));
   });
 
+router.get('/getUsers', (req, res) => {
+  Models.User.findAll().then((allUserData) => {
+    const userArray = [];
+    allUserData.forEach((user) => {
+      const {
+        firstName, lastName, email, pseudo, id, 
+      } = user.dataValues; 
+      userArray.push({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        pseudo: pseudo,
+        id: id,
+      });
+    });
+    res.json(userArray);
+  });
+});
 // Route relative à l'affichage et la creation de sondage
 
 router.get('/getSondage', (req, res) => {
@@ -80,25 +98,6 @@ router.get('/getSondage', (req, res) => {
     });
   });
 });
-
-/* Survey object sent from the front to /postSondage
-  {
-    name: sondagename,
-    thematiqueList: [
-      {
-        name: thematiquename,
-        questionList: [
-          {
-            keyWord: motclef,
-            question: question,
-          },
-          { ... },
-        ]
-      },
-      { ... },
-    ]
-  }
-*/
 
 router.post('/postSondage', (req, res) => {
   Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
