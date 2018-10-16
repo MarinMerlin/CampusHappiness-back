@@ -44,7 +44,6 @@ app.use(express.urlencoded({
 app.use(cookieParser(env.session_secret_key));
 app.use(session({
   genid: function genid(req) {
-    console.log('Inside the session middleware');
     console.log(req.sessionID);
     return id_generator(); // use UUIDs for session IDs
   },

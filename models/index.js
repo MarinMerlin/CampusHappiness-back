@@ -14,6 +14,7 @@ const reponseConstructor = require('./constructor/reponse');
 const sondageConstructor = require('./constructor/sondage');
 const thematiqueConstructor = require('./constructor/thematique');
 const commentaireConstructor = require('./constructor/commentaire');
+const keywordConstructor = require('./constructor/keyword')
 
 // sequelize connection
 const sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -38,6 +39,7 @@ const Reponse = reponseConstructor(sequelize);
 const Sondage = sondageConstructor(sequelize);
 const Thematique = thematiqueConstructor(sequelize);
 const Commentaire = commentaireConstructor(sequelize);
+const Keyword = keywordConstructor(sequelize);
 
 // // Foreign keys
 Question.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
@@ -178,6 +180,7 @@ User.prototype.getStatisticsSpecific = function (date) {
         resolveAll("no sondage this day...");
       } else {
         const sondage_id = jourSondage.dataValues.sondage_id;
+        console.log(sondage_id);
         const questionList = [];
         const thematiqueIdList = [];
         const remplissageIdList = [];
@@ -221,14 +224,19 @@ User.prototype.getStatisticsSpecific = function (date) {
             });
           }));
           promises.push(new Promise(function (resolve) {
-            Reponse.findAll({ where: { remplissage_id: { [Op.or]: remplissageIdList } } }).then(((reponses) => {
-              reponses.forEach((reponse) => {
-                reponseList.push(reponse.dataValues);
-              });
+            if (remplissageIdList.length > 0) {
+              Reponse.findAll({ where: { remplissage_id: { [Op.or]: remplissageIdList } } }).then(((reponses) => {
+                reponses.forEach((reponse) => {
+                  reponseList.push(reponse.dataValues);
+                });
+                resolve();
+              }));
+            } else {
               resolve();
-            }));
+            }
           }));
           Promise.all(promises).then(() => {
+            console.log(questionList);
             // thematiqueId --> { thematiqueName, questionMap }
             // questionMap: questionId --> { keyWord, sum, numberAnswer } 
             const sondageMap = new Map();
@@ -658,6 +666,7 @@ const Models = {
   Reponse: Reponse,
   Thematique: Thematique,
   Commentaire: Commentaire,
+  Keyword: Keyword,
 };
 
 module.exports = Models;

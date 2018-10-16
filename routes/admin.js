@@ -151,4 +151,27 @@ router.get("/specificStatistics/:year/:month/:day", (req, res) => {
   });
 });
 
+router.get("/getKeywords", (req, res) => {
+  Models.Keyword.findAll().then((keywords) => {
+    const keywordList = [];
+    keywords.forEach((keyword) => {
+      keywordList.push(keyword.dataValues.name);
+    });
+    res.status(200).json(keywordList);
+  });
+});
+
+router.post("/addKeyWord", (req, res) => {
+  console.log(req.body);
+  Models.Keyword.addKeyword(req.body.name).then(() => {
+    Models.Keyword.findAll().then((keywords) => {
+      const keywordList = [];
+      keywords.forEach((keyword) => {
+        keywordList.push(keyword.dataValues.name);
+      });
+      res.status(200).json(keywordList);
+    });
+  });
+});
+
 module.exports = router;
