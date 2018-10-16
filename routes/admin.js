@@ -49,29 +49,26 @@ router.use((req, res, next) => {
   }
 }); */
 
-router.post('/csvPost',
+// firstName, lastName, email, pseudo, password, auth, photo
+router.post('/postUsers',
   (req, res) => {
     const promises = [];
     req.body.userList.forEach((user) => {
-      promises.push(Models.User.addUser(user.firstName, user.lastName, user.email));
+      let authValue = 0;
+      if (user.admin) {
+        authValue = 1;
+      }
+      promises.push(Models.User.addUser(
+        user.firstName,
+        user.lastName,
+        user.email,
+        user.pseudo, 
+        user.password, 
+        authValue,
+      ));
     });
-    Promise.all(promises).then(res.status(200).json("User list added"));
+    Promise.all(promises).then(res.status(200).json({ success: true }));
   });
-
-router.post('/singlePost',
-  (req, res) => {
-    Models.User.addUser(
-      req.body.firstName, 
-      req.body.lastName, 
-      req.body.email, 
-      req.body.pseudo,
-      req.body.password,
-      req.body.auth,
-    ).then(() => {
-      res.status(200).send("New user added");
-      console.log("New user added: ", req.body.pseudo);
-    });
-  }); 
 
 // Route relative à l'affichage et la creation de sondage
 
@@ -102,6 +99,7 @@ router.get('/getSondage', (req, res) => {
     ]
   }
 */
+
 router.post('/postSondage', (req, res) => {
   Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
     user.createSondage(req.body).then((sondageId) => {

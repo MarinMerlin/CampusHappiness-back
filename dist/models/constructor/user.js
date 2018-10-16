@@ -118,12 +118,14 @@ var userConstructor = function userConstructor(sequelize) {
   };
 
   User.prototype.generateJwt = function (sondage_id) {
+    var id_remplissage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var expiry = new Date();
+    var remplissage_id = id_remplissage || id_generator();
     expiry.setDate(expiry.getDate() + env.user_token_expiry_time);
     return jwt.sign({
       user_id: this.id,
       sondage_id: sondage_id,
-      remplissage_id: id_generator(),
+      remplissage_id: remplissage_id,
       firstName: this.firstName,
       lastName: this.lastName,
       exp: parseInt(expiry.getTime() / 1000, 10)

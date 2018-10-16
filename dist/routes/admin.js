@@ -102,9 +102,10 @@ router.post('/postSondage', function (req, res) {
       id: req.user.id
     }
   }).then(function (user) {
-    user.createSondage(req.body).then(function () {
-      console.log("New sondage created: ", req.body.name);
-      res.status(200).send("New sondage created");
+    user.createSondage(req.body).then(function (sondageId) {
+      res.json({
+        sondageId: sondageId
+      });
     });
   });
 });

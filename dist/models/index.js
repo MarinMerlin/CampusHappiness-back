@@ -605,60 +605,12 @@ User.prototype.getUserStat = function () {
           });
         });
         reponse.push(themPromise);
-        /* reponse[thematique.dataValues.name] = [];
-        for (let i = 0; i < 31; i++) {
-          reponse[thematique.dataValues.name].push(getDayStatis(Date.now() - (86400000 * i), thematique.dataValues.id));
-        }
-        Promise.all(reponse[thematique.dataValues.name]).then( data => {
-         }); */
       });
       Promise.all(reponse).then(function (data) {
         resolve(data);
       });
     });
   });
-  /* Reponse.findAll({
-      include: [{
-        model: Remplissage,
-        where: { user_id: this.id },
-      }],
-    }).then((reps) => {
-      const listRep = {};
-      const promises = [];
-      reps.forEach((rep) => {
-        const promise = Question.findOne({
-          where: { id: rep.dataValues.question_id },
-          include: [{
-            model: Thematique,
-          }],
-        });
-        promises.push(promise);
-        promise.then((them) => {
-          const themName = them.dataValues.thematique.dataValues.name;
-          console.log(listRep[themName]);
-          if (listRep[themName]) {
-            listRep[themName].push({ 
-              value: rep.dataValues.valeur, 
-              date: rep.dataValues.remplissage.dataValues.date,
-            });
-          } else {
-            listRep[themName] = [{ 
-              value: rep.dataValues.valeur, 
-              date: rep.dataValues.remplissage.dataValues.date, 
-            }];
-          }
-        });
-      });
-      Promise.all(promises).then(() => {
-        const listRep2 = [];
-        listRep.forEach((thematique) => {
-          console.log(thematique.index);
-          // listRep2.push({thematique: })
-        });
-        resolve(listRep);
-      });
-    });
-  }); */
 };
 
 User.prototype.findSondage = function (req) {

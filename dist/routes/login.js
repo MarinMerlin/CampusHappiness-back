@@ -29,6 +29,9 @@ passport.deserializeUser(function (id, done) {
 router.post('/', passport.authenticate('local', {
   session: true
 }), function (req, res) {
+  console.log('login');
+  console.log(req.body);
+
   switch (req.user) {
     case "wrongUser":
       res.status(401).json({

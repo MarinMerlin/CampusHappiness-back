@@ -51,11 +51,14 @@ var fakeSurvey = {
       text: 'Etait-ce trop bryuant?',
       keyWord: 'Bruit'
     }, {
-      text: 'th1 question4',
-      keyWord: 'q4'
+      text: 'Le prix convenait il?',
+      keyWord: 'Prix'
     }, {
-      text: 'th1 question5',
-      keyWord: 'q5'
+      text: "Propreté de la cafeteria",
+      keyWord: 'Propreté'
+    }, {
+      text: "Propreté des sanitaires",
+      keyWord: 'propreté'
     }]
   }, {
     name: 'Bureau',
@@ -72,23 +75,23 @@ var fakeSurvey = {
       text: 'Votre bureau était il sale?',
       keyWord: 'Propreté'
     }, {
-      text: 'th2 question3',
-      keyWord: 'q3'
+      text: 'Ambiance',
+      keyWord: 'Ambiance'
     }, {
-      text: 'th2 question4',
-      keyWord: 'q4'
+      text: 'Le materielle',
+      keyWord: 'Materielle'
     }]
   }, {
-    name: 'thematique 3',
+    name: 'Espace de repos',
     questionList: [{
-      text: 'th3 question1',
-      keyWord: 'q1'
+      text: 'Le lieux était il propre',
+      keyWord: 'Propreté'
     }, {
-      text: 'th3 question2',
-      keyWord: 'q2'
+      text: "L'ambiance était elle convenable?",
+      keyWord: 'Ambiance'
     }, {
-      text: 'th3 question3',
-      keyWord: 'q3'
+      text: 'Temperature convenable?',
+      keyWord: 'Temperature'
     }]
   }]
 };
@@ -103,7 +106,7 @@ var addManyUsers = function addManyUsers(userNumber) {
       var promiseArray = [];
 
       for (var i = 0; i < userNumber; i++) {
-        promiseArray.push(User.addUser('prenom', 'nom', 'goulven.molaret@supekec.fr', 'foutre', 'mdp', 0));
+        promiseArray.push(User.addUser('User', 'User', 'user.user@gmail.fr', 'User', 'mdp', 0));
       }
 
       Promise.all(promiseArray).then(resolve);
@@ -186,11 +189,11 @@ var answerAll = function answerAll() {
 
 var firstDay = function firstDay() {
   return new Promise(function (resolve) {
-    User.addUser('marin', 'merlin', 'marin.merlin@me.com', 'mokoloco', 'mdp', 1).then(function () {
+    User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(function () {
       addManyUsers(10).then(function () {
         User.findOne({
           where: {
-            pseudo: 'mokoloco'
+            pseudo: 'Admin'
           }
         }).then(function (user) {
           user.createSondage(fakeSurvey).then(function (sondage_id) {

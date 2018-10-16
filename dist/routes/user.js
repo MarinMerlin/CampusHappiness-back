@@ -32,7 +32,7 @@ router.use(function (req, res, next) {
 
 router.post('/updateUser', function (req, res) {
   var newCookie = Object.assign(req.user, req.body.updatedUser);
-  req.login(newCookie, function (err) {
+  req.login(newCookie, function () {
     console.log("Modified cookie: ", newCookie);
   });
   Models.User.updateUser(req.user.id, req.body.updatedUser).then(function () {
@@ -66,15 +66,33 @@ router.get('/getToken', function (req, res) {
       current: true
     }
   }).then(function (sondage) {
-    Models.User.findOne({
+    Models.Remplissage.findOne({
       where: {
-        id: req.user.id
+        user_id: req.user.id,
+        date: Date.now(),
+        sondage_id: sondage.dataValues.id
       }
-    }).then(function (user) {
-      var sondage_id = sondage.dataValues.id;
-      var token = user.generateJwt(sondage_id);
-      res.status(200).send({
-        token: token
+    }).then(function (remplissage) {
+      Models.User.findOne({
+        where: {
+          id: req.user.id
+        }
+      }).then(function (user) {
+        var sondage_id = sondage.dataValues.id;
+        var token;
+        var alreadyAnswered = false;
+
+        if (remplissage) {
+          alreadyAnswered = true;
+          token = user.generateJwt(sondage_id, remplissage.dataValues.id);
+        } else {
+          token = user.generateJwt(sondage_id);
+        }
+
+        res.status(200).send({
+          token: token,
+          alreadyAnswered: alreadyAnswered
+        });
       });
     });
   });
@@ -86,7 +104,6 @@ router.get('/userStat', function (req, res) {
     }
   }).then(function (user) {
     user.getUserStat().then(function (data) {
-      console.log("PLOPPPPPP   ", data);
       res.status(200).send(data);
     });
   });
