@@ -14,7 +14,8 @@ const reponseConstructor = require('./constructor/reponse');
 const sondageConstructor = require('./constructor/sondage');
 const thematiqueConstructor = require('./constructor/thematique');
 const commentaireConstructor = require('./constructor/commentaire');
-const keywordConstructor = require('./constructor/keyword')
+const keywordConstructor = require('./constructor/keyword');
+const groupConstructor = require('./constructor/group');
 
 // sequelize connection
 const sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -40,10 +41,13 @@ const Sondage = sondageConstructor(sequelize);
 const Thematique = thematiqueConstructor(sequelize);
 const Commentaire = commentaireConstructor(sequelize);
 const Keyword = keywordConstructor(sequelize);
+const Group = groupConstructor(sequelize);
 
 // // Foreign keys
 Question.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
 JourSondage.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
+Group.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
+User.belongsTo(Group, { foreignKey: 'group_id', targetKey: 'id' });
 Reponse.belongsTo(Question, { foreignKey: 'question_id', targetKey: 'id' });
 Reponse.belongsTo(Remplissage, { foreignKey: 'remplissage_id', targetKey: 'id' });
 Remplissage.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
@@ -90,11 +94,22 @@ User.prototype.getSondage = function () {
             id: sondage.dataValues.id, 
             name: sondage.dataValues.name,
             thematiqueList: thematiqueList,
-            current: sondage.dataValues.current,
           });
         });
         resolve(sondageList);
       });
+    });
+  });
+};
+
+User.prototype.getGroups = function () {
+  return new Promise((resolve) => {
+    const groupList = [];
+    Group.findAll().then((groups) => {
+      groups.forEach((group) => {
+        groupList.push({ id: group.dataValues.id, name: group.dataValues.name });
+      });
+      resolve(groupList);
     });
   });
 };
@@ -129,6 +144,29 @@ User.prototype.createSondage = function (sondage) {
           });
         });
         Promise.all(promises).then(() => { resolve(sondage_id); });
+      });
+    });
+  });
+};
+
+User.prototype.updateSondage = function (sondage, id) {
+  return new Promise((resolve) => {
+    Sondage.findOne({ where: { id: id } }).then(() => {
+      let promises = [];
+      sondage.thematiqueList.forEach((thematique) => {
+        promises.push(Thematique.addThematique(thematique.name));
+      });
+      Promise.all(promises).then((thematiqueListWithId) => {
+        addThematiqueId(sondage.thematiqueList, thematiqueListWithId);
+        promises = [];
+        sondage.thematiqueList.forEach((thematique) => {
+          thematique.questionList.forEach((question) => {
+            promises.push(Question.addQuestion(
+              id, thematique.id, question.text, question.keyWord,
+            ));
+          });
+        });
+        Promise.all(promises).then(() => { resolve(id); });
       });
     });
   });
@@ -622,7 +660,7 @@ User.prototype.answerSondage = function (sondage, simulationDate) {
   });
 };
 
-User.prototype.updateSondage = function (sondage) {
+User.prototype.updateAnswer = function (sondage) {
   return new Promise((resolve) => {
     const remplissage_id = sondage.remplissage_id;
     sondage.answered_questions.forEach((question) => {
@@ -667,6 +705,7 @@ const Models = {
   Thematique: Thematique,
   Commentaire: Commentaire,
   Keyword: Keyword,
+  Group: Group,
 };
 
 module.exports = Models;

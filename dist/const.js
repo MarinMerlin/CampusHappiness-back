@@ -11,7 +11,8 @@ var env = {
   // en jours
   user_token_secret_key: "mon secret",
   user_token_expiry_time: 1,
-  session_secret_key: "lagrossebiteadudule"
+  session_secret_key: "lagrossebiteadudule",
+  default_group: 'default_group_id'
 };
 module.exports = env;
 //# sourceMappingURL=const.js.map

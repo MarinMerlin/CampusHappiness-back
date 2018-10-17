@@ -19,10 +19,6 @@ const sondageConstructor = function (sequelize) {
       allowNull: false,
       type: Sequelize.DATEONLY,
     },
-    current: {
-      allowNull: false,
-      type: Sequelize.BOOLEAN,
-    },
   }, {
     timestamps: false,
   });
@@ -35,7 +31,6 @@ const sondageConstructor = function (sequelize) {
           name: name,
           author: author,
           createdAt: createdAt,
-          current: false,
         }).then(() => {
           resolve();
         });

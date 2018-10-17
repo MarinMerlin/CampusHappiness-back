@@ -54,24 +54,26 @@ router.post('/updatePhoto', (req, res) => {
 });
 
 router.get('/getToken', (req, res) => {
-  Models.Sondage.findOne({ where: { current: true } }).then((sondage) => {
-    Models.Remplissage.findOne(
-      { where: { user_id: req.user.id, date: Date.now(), sondage_id: sondage.dataValues.id } },
-    )
-      .then((remplissage) => {
-        Models.User.findOne({ where: { id: req.user.id } })
-          .then((user) => {
-            const sondage_id = sondage.dataValues.id;
-            let token;
-            let alreadyAnswered = false;
-            if (remplissage) {
-              alreadyAnswered = true;
-              token = user.generateJwt(sondage_id, remplissage.dataValues.id);
-            } else {
-              token = user.generateJwt(sondage_id);
-            }
-            res.status(200).send({ token: token, alreadyAnswered: alreadyAnswered });
-          });
+  Models.User.findOne({
+    include: [{ model: Models.Group }],
+    where: { id: req.user.id }, 
+  }).then((user) => {
+    Models.Sondage.findOne({ where: { id: user.dataValues.group.dataValues.sondage_id } })
+      .then((sondage) => {
+        Models.Remplissage.findOne(
+          { where: { user_id: req.user.id, date: Date.now(), sondage_id: sondage.dataValues.id } },
+        ).then((remplissage) => {
+          const sondage_id = sondage.dataValues.id;
+          let token;
+          let alreadyAnswered = false;
+          if (remplissage) {
+            alreadyAnswered = true;
+            token = user.generateJwt(sondage_id, remplissage.dataValues.id);
+          } else {
+            token = user.generateJwt(sondage_id);
+          }
+          res.status(200).send({ token: token, alreadyAnswered: alreadyAnswered });
+        });
       });
   });
 });

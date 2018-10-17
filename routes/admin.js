@@ -99,6 +99,15 @@ router.get('/getSondage', (req, res) => {
   });
 });
 
+router.get('/getGroups', (req, res) => {
+  Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
+    user.getGroups().then((groupList) => {
+      console.log("Sent all groups to client");
+      res.status(200).json(groupList);
+    });
+  });
+});
+
 router.post('/postSondage', (req, res) => {
   Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
     user.createSondage(req.body).then((sondageId) => {

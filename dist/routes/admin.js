@@ -50,18 +50,42 @@ router.use(function (req, res, next) {
     });
   }
 }); */
+// firstName, lastName, email, pseudo, password, auth, photo
 
-router.post('/csvPost', function (req, res) {
+router.post('/postUsers', function (req, res) {
   var promises = [];
   req.body.userList.forEach(function (user) {
-    promises.push(Models.User.addUser(user.firstName, user.lastName, user.email));
+    var authValue = 0;
+
+    if (user.admin) {
+      authValue = 1;
+    }
+
+    promises.push(Models.User.addUser(user.firstName, user.lastName, user.email, user.pseudo, user.password, authValue));
   });
-  Promise.all(promises).then(res.status(200).json("User list added"));
+  Promise.all(promises).then(res.status(200).json({
+    success: true
+  }));
 });
-router.post('/singlePost', function (req, res) {
-  Models.User.addUser(req.body.firstName, req.body.lastName, req.body.email, req.body.pseudo, req.body.password, req.body.auth).then(function () {
-    res.status(200).send("New user added");
-    console.log("New user added: ", req.body.pseudo);
+router.get('/getUsers', function (req, res) {
+  Models.User.findAll().then(function (allUserData) {
+    var userArray = [];
+    allUserData.forEach(function (user) {
+      var _user$dataValues = user.dataValues,
+          firstName = _user$dataValues.firstName,
+          lastName = _user$dataValues.lastName,
+          email = _user$dataValues.email,
+          pseudo = _user$dataValues.pseudo,
+          id = _user$dataValues.id;
+      userArray.push({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        pseudo: pseudo,
+        id: id
+      });
+    });
+    res.json(userArray);
   });
 }); // Route relative à l'affichage et la creation de sondage
 
@@ -77,25 +101,18 @@ router.get('/getSondage', function (req, res) {
     });
   });
 });
-/* Survey object sent from the front to /postSondage
-  {
-    name: sondagename,
-    thematiqueList: [
-      {
-        name: thematiquename,
-        questionList: [
-          {
-            keyWord: motclef,
-            question: question,
-          },
-          { ... },
-        ]
-      },
-      { ... },
-    ]
-  }
-*/
-
+router.get('/getGroups', function (req, res) {
+  Models.User.findOne({
+    where: {
+      id: req.user.id
+    }
+  }).then(function (user) {
+    user.getGroups().then(function (groupList) {
+      console.log("Sent all groups to client");
+      res.status(200).json(groupList);
+    });
+  });
+});
 router.post('/postSondage', function (req, res) {
   Models.User.findOne({
     where: {

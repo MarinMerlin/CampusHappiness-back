@@ -49,13 +49,16 @@ var userConstructor = function userConstructor(sequelize) {
     },
     mailIntensity: {
       type: Sequelize.INTEGER
+    },
+    group_id: {
+      type: Sequelize.STRING
     }
   }, {
     timestamps: false
   }); // Class Methods
 
   User.addUser = function (firstName, lastName, email, pseudo, password, auth) {
-    var photo = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '/user/photo/default.jpg';
+    var group_id = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : env.default_group;
     return new Promise(function (resolve) {
       var generatedID = id_generator();
       var salt = crypto.randomBytes(16).toString('hex');
@@ -69,8 +72,9 @@ var userConstructor = function userConstructor(sequelize) {
           auth: auth,
           salt: salt,
           hash: crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex'),
-          photo: photo,
+          photo: '/user/photo/default.jpg',
           mailIntensity: 1,
+          group_id: group_id,
           lastMailDate: Date.now() - 86400000
         }).then(function () {
           resolve();

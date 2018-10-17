@@ -6,13 +6,16 @@ var id_generator = require('../custom_module/id_generator');
 
 var clearTables = require('./setup');
 
+var env = require("../const");
+
 var Sondage = Models.Sondage,
     User = Models.User,
     Reponse = Models.Reponse,
     Question = Models.Question,
     Remplissage = Models.Remplissage,
     JourSondage = Models.JourSondage,
-    Keyword = Models.Keyword;
+    Keyword = Models.Keyword,
+    Group = Models.Group;
 var simulationTime = 35;
 var simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
@@ -190,26 +193,24 @@ var answerAll = function answerAll() {
 
 var firstDay = function firstDay() {
   return new Promise(function (resolve) {
-    User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(function () {
-      addManyUsers(10).then(function () {
-        User.findOne({
-          where: {
-            pseudo: 'Admin'
-          }
-        }).then(function (user) {
-          user.createSondage(fakeSurvey).then(function (sondage_id) {
-            Sondage.update({
-              current: true
-            }, {
+    var sondage_id = id_generator();
+    Sondage.addSondage(sondage_id, 'Admin', Date.now(), fakeSurvey.name).then(function () {
+      Group.addGroup(sondage_id, 'default', env.default_group).then(function () {
+        User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(function () {
+          addManyUsers(10).then(function () {
+            User.findOne({
               where: {
-                id: sondage_id
+                pseudo: 'Admin'
               }
-            });
-            Keyword.addKeyword("Qualité");
-            getQuestionIdList(sondage_id).then(function () {
-              answerAll().then(function () {
-                incrementDay();
-                resolve();
+            }).then(function (user) {
+              user.updateSondage(fakeSurvey, sondage_id).then(function () {
+                Keyword.addKeyword("Qualité");
+                getQuestionIdList(sondage_id).then(function () {
+                  answerAll().then(function () {
+                    incrementDay();
+                    resolve();
+                  });
+                });
               });
             });
           });
