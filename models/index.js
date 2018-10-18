@@ -14,7 +14,8 @@ const reponseConstructor = require('./constructor/reponse');
 const sondageConstructor = require('./constructor/sondage');
 const thematiqueConstructor = require('./constructor/thematique');
 const commentaireConstructor = require('./constructor/commentaire');
-const keywordConstructor = require('./constructor/keyword')
+const keywordConstructor = require('./constructor/keyword');
+const choiceConstructor = require('./constructor/choice');
 
 // sequelize connection
 const sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -40,6 +41,7 @@ const Sondage = sondageConstructor(sequelize);
 const Thematique = thematiqueConstructor(sequelize);
 const Commentaire = commentaireConstructor(sequelize);
 const Keyword = keywordConstructor(sequelize);
+const Choice = choiceConstructor(sequelize);
 
 // // Foreign keys
 Question.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
@@ -51,6 +53,7 @@ Remplissage.belongsTo(User, { foreignKey: 'user_id', targetKey: 'id' });
 Question.belongsTo(Thematique, { foreignKey: 'thematique_id', targetKey: 'id' });
 Commentaire.belongsTo(Thematique, { foreignKey: 'thematique_id', targetKey: 'id' });
 Commentaire.belongsTo(Remplissage, { foreignKey: 'remplissage_id', targetKey: 'id' });
+Choice.belongsTo(Question, { foreignKey: 'question_id', targetKey: 'id' });
 
 // Should change this function by using promises more
 User.prototype.getSondage = function () {
