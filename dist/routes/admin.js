@@ -76,16 +76,53 @@ router.get('/getUsers', function (req, res) {
           lastName = _user$dataValues.lastName,
           email = _user$dataValues.email,
           pseudo = _user$dataValues.pseudo,
-          id = _user$dataValues.id;
+          id = _user$dataValues.id,
+          group_id = _user$dataValues.group_id;
       userArray.push({
         firstName: firstName,
         lastName: lastName,
         email: email,
         pseudo: pseudo,
-        id: id
+        id: id,
+        group_id: group_id
       });
     });
     res.json(userArray);
+  });
+});
+router.post('/postGroup', function (req, res) {
+  Models.Sondage.findOne().then(function (sondage) {
+    Models.Group.addGroup(sondage.dataValues.id, req.body.groupName).then(function () {
+      res.status(200).json({
+        success: true
+      });
+    });
+  });
+});
+router.post('/changeUserGroup', function (req, res) {
+  var promises = [];
+  req.body.selectedUsers.forEach(function (user) {
+    var promise = new Promise(function (resolve) {
+      if (user.check) {
+        Models.User.update({
+          group_id: req.body.selectedGroup.id
+        }, {
+          where: {
+            id: user.id
+          }
+        }).then(function () {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+    promises.push(promise);
+  });
+  Promise.all(promises).then(function () {
+    res.status(200).json({
+      success: true
+    });
   });
 }); // Route relative à l'affichage et la creation de sondage
 
@@ -131,23 +168,15 @@ router.post('/changeNextSondage', function (req, res) {
     console.log("/!\\ ERROR : Inccorect body");
     res.status(400).send("Bad Request : The body doesnt contain next_sondage ! ");
   } else {
-    Models.Sondage.update({
-      current: false
+    Models.Group.update({
+      sondage_id: req.body.sondage_id
     }, {
       where: {
-        current: true
+        id: req.body.group_id
       }
     }).then(function () {
-      Models.Sondage.update({
-        current: true
-      }, {
-        where: {
-          id: req.body.id
-        }
-      }).then(function (sondage) {
-        console.log("Changed the sondage to sondage: ", req.body.name);
-        res.status(200).json(sondage.dataValues);
-      });
+      console.log("Changed the sondage to sondage: ", req.body.sondage_id, " for the group: ", req.body.sondage_id);
+      res.status(200).json("Changed the sondage to sondage: ".concat(req.body.sondage_name, " for the group: ").concat(req.body.sondage_name));
     });
   }
 }); // Route relative aux statisques

@@ -2,7 +2,6 @@ const express = require('express');
 
 const router = express.Router();
 
-
 // Le body Parser permet d'acceder aux variable envoyés dans le body
 const bodyParser = require('body-parser');
 
@@ -75,7 +74,7 @@ router.get('/getUsers', (req, res) => {
     const userArray = [];
     allUserData.forEach((user) => {
       const {
-        firstName, lastName, email, pseudo, id, 
+        firstName, lastName, email, pseudo, id, group_id,
       } = user.dataValues; 
       userArray.push({
         firstName: firstName,
@@ -83,9 +82,38 @@ router.get('/getUsers', (req, res) => {
         email: email,
         pseudo: pseudo,
         id: id,
+        group_id: group_id,
       });
     });
     res.json(userArray);
+  });
+});
+
+router.post('/postGroup', (req, res) => {
+  Models.Sondage.findOne().then((sondage) => {
+    Models.Group.addGroup(sondage.dataValues.id, req.body.groupName).then(() => {
+      res.status(200).json({ success: true });
+    });
+  });
+});
+
+router.post('/changeUserGroup', (req, res) => {
+  const promises = [];
+  req.body.selectedUsers.forEach((user) => {
+    const promise = new Promise((resolve) => {
+      if (user.check) {
+        Models.User.update({ group_id: req.body.selectedGroup.id }, { where: { id: user.id } })
+          .then(() => {
+            resolve();
+          });
+      } else {
+        resolve();
+      }
+    });
+    promises.push(promise);
+  });
+  Promise.all(promises).then(() => {
+    res.status(200).json({ success: true });
   });
 });
 // Route relative à l'affichage et la creation de sondage
@@ -121,12 +149,11 @@ router.post('/changeNextSondage', (req, res) => {
     console.log("/!\\ ERROR : Inccorect body");
     res.status(400).send("Bad Request : The body doesnt contain next_sondage ! ");
   } else {
-    Models.Sondage.update({ current: false }, { where: { current: true } }).then(() => {
-      Models.Sondage.update({ current: true }, { where: { id: req.body.id } }).then((sondage) => {
-        console.log("Changed the sondage to sondage: ", req.body.name);
-        res.status(200).json(sondage.dataValues);
+    Models.Group.update({ sondage_id: req.body.sondage_id }, { where: { id: req.body.group_id } })
+      .then(() => {
+        console.log("Changed the sondage to sondage: ", req.body.sondage_id, " for the group: ", req.body.sondage_id);
+        res.status(200).json(`Changed the sondage to sondage: ${req.body.sondage_name} for the group: ${req.body.sondage_name}`);
       });
-    });
   }
 });
 

@@ -47,7 +47,7 @@ router.post('/updatePhoto', (req, res) => {
         { photo: `/user/photo/${req.user.pseudo}.jpg` },
         { where: { id: req.user.id } },
       ).then(() => {
-        res.status(200).json({ photo: `/user/photo/${req.user.pseudo}` });
+        res.status(200).json({ photo: `/user/photo/${req.user.pseudo}.jpg` });
       });
     }
   });

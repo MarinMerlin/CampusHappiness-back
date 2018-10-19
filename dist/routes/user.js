@@ -53,7 +53,7 @@ router.post('/updatePhoto', function (req, res) {
         }
       }).then(function () {
         res.status(200).json({
-          photo: "/user/photo/".concat(req.user.pseudo)
+          photo: "/user/photo/".concat(req.user.pseudo, ".jpg")
         });
       });
     }
