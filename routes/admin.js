@@ -184,6 +184,8 @@ router.get("/specificStatistics/:year/:month/:day", (req, res) => {
   });
 });
 
+// Route relative aux aux mot clef
+
 router.get("/getKeywords", (req, res) => {
   Models.Keyword.findAll().then((keywords) => {
     const keywordList = [];
@@ -205,6 +207,8 @@ router.post("/addKeyWord", (req, res) => {
     });
   });
 });
+
+// Route relative aux posts
 
 router.get("/getPosts", (req, res) => {
   Models.Post.findAll().then((posts) => {

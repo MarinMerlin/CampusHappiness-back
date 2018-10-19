@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const id_generator = require('../../custom_module/id_generator');
 const env = require("../../const");
+const accountCreationMail = require('../../mail/accountCreation');
 
 const userConstructor = function (sequelize) {
   const User = sequelize.define('user', {
@@ -70,7 +71,11 @@ const userConstructor = function (sequelize) {
           mailIntensity: 1,
           group_id: group_id,
           lastMailDate: Date.now() - 86400000,
-        }).then(() => {
+        }).then((user) => {
+          accountCreationMail({
+            ...user.dataValues,
+            password: password,
+          });
           resolve();
         });
       });

@@ -37,7 +37,11 @@ var commentaireConstructor = require('./constructor/commentaire');
 
 var keywordConstructor = require('./constructor/keyword');
 
-var groupConstructor = require('./constructor/group'); // sequelize connection
+var groupConstructor = require('./constructor/group');
+
+var choiceConstructor = require('./constructor/choice');
+
+var postConstructor = require('./constructor/post'); // sequelize connection
 
 
 var sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -62,7 +66,9 @@ var Sondage = sondageConstructor(sequelize);
 var Thematique = thematiqueConstructor(sequelize);
 var Commentaire = commentaireConstructor(sequelize);
 var Keyword = keywordConstructor(sequelize);
-var Group = groupConstructor(sequelize); // // Foreign keys
+var Group = groupConstructor(sequelize);
+var Choice = choiceConstructor(sequelize);
+var Post = postConstructor(sequelize); // // Foreign keys
 
 Question.belongsTo(Sondage, {
   foreignKey: 'sondage_id',
@@ -106,6 +112,10 @@ Commentaire.belongsTo(Thematique, {
 });
 Commentaire.belongsTo(Remplissage, {
   foreignKey: 'remplissage_id',
+  targetKey: 'id'
+});
+Choice.belongsTo(Question, {
+  foreignKey: 'question_id',
   targetKey: 'id'
 }); // Should change this function by using promises more
 
@@ -847,7 +857,8 @@ var Models = {
   Thematique: Thematique,
   Commentaire: Commentaire,
   Keyword: Keyword,
-  Group: Group
+  Group: Group,
+  Post: Post
 };
 module.exports = Models;
 //# sourceMappingURL=index.js.map

@@ -11,7 +11,13 @@ var Sondage = Models.Sondage,
     JourSondage = Models.JourSondage,
     Commentaire = Models.Commentaire,
     Keyword = Models.Keyword,
-    Group = Models.Group;
+    Group = Models.Group,
+    Post = Models.Post;
+Post.sync({
+  force: true
+}).then(function () {
+  console.log("sync true $$$$$$$");
+});
 
 var creationTable = function creationTable() {
   return new Promise(function (resolveAll) {

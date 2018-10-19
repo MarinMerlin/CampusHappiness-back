@@ -15,7 +15,8 @@ var Sondage = Models.Sondage,
     Remplissage = Models.Remplissage,
     JourSondage = Models.JourSondage,
     Keyword = Models.Keyword,
-    Group = Models.Group;
+    Group = Models.Group,
+    Post = Models.Post;
 var simulationTime = 35;
 var simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
@@ -266,5 +267,20 @@ clearTables().then(function () {
   firstDay().then(function () {
     Alldays(simulationTime);
   });
+});
+var post_number = 6;
+var fake_post = {
+  title: "Good News !",
+  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+};
+console.log("Adding posts ...");
+var postPromiseArray = [];
+
+for (var index = 0; index < 6; index++) {
+  postPromiseArray.push(Post.addPost(fake_post));
+}
+
+Promise.all(postPromiseArray).then(function () {
+  console.log(post_number, " Posts added");
 });
 //# sourceMappingURL=simulation.js.map

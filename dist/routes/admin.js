@@ -16,22 +16,18 @@ var morgan = require('morgan'); // Récupère les models
 
 var Models = require('../models/index');
 
-router.use(morgan('dev'));
-router.use(function (req, res, next) {
-  if (req.url === '/login') {
-    next();
-  } else if (!req.isAuthenticated()) {
-    res.status(401).json({
-      message: 'Not logged in'
-    });
-  } else if (req.user.auth !== 1) {
-    res.status(401).json({
-      message: 'Not authorized'
-    });
-  } else {
-    next();
-  }
-}); // --------- Routes protegées par token -------------
+router.use(morgan('dev')); // router.use((req, res, next) => {
+//   if (req.url === '/login') {
+//     next();
+//   } else if (!req.isAuthenticated()) {
+//     res.status(401).json({ message: 'Not logged in' });
+//   } else if (req.user.auth !== 1) {
+//     res.status(401).json({ message: 'Not authorized' });
+//   } else {
+//     next();
+//   }
+// });
+// --------- Routes protegées par token -------------
 // Un administrateur peut ajouter un autre administrateur :
 // Les attributs de l'admin sont dans le body de la requète
 // TODO : Prendre en compte le cas où il y a une erreure au cours de la création de l'admin'
@@ -202,7 +198,8 @@ router.get("/specificStatistics/:year/:month/:day", function (req, res) {
       res.json(sondageResult);
     });
   });
-});
+}); // Route relative aux aux mot clef
+
 router.get("/getKeywords", function (req, res) {
   Models.Keyword.findAll().then(function (keywords) {
     var keywordList = [];
@@ -213,7 +210,6 @@ router.get("/getKeywords", function (req, res) {
   });
 });
 router.post("/addKeyWord", function (req, res) {
-  console.log(req.body);
   Models.Keyword.addKeyword(req.body.name).then(function () {
     Models.Keyword.findAll().then(function (keywords) {
       var keywordList = [];
@@ -222,6 +218,18 @@ router.post("/addKeyWord", function (req, res) {
       });
       res.status(200).json(keywordList);
     });
+  });
+}); // Route relative aux posts
+
+router.get("/getPosts", function (req, res) {
+  Models.Post.findAll().then(function (posts) {
+    res.json(posts);
+  });
+});
+router.post("/addPost", function (req, res) {
+  Models.Post.addPost(req.body.post);
+  res.json({
+    success: true
   });
 });
 module.exports = router;
