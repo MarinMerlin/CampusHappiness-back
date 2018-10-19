@@ -4,7 +4,7 @@ const clearTables = require('./setup');
 const env = require("../const");
 
 const { 
-  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group,
+  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group, Post,
 } = Models;
 
 const simulationTime = 35;
@@ -259,4 +259,19 @@ clearTables().then(() => {
   firstDay().then(() => {
     Alldays(simulationTime);
   });
+});
+
+const post_number = 6;
+const fake_post = {
+  title: "Good News !",
+  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+};
+
+console.log("Adding posts ...");
+const postPromiseArray = [];
+for (let index = 0; index < 6; index++) {
+  postPromiseArray.push(Post.addPost(fake_post));
+}
+Promise.all(postPromiseArray).then(() => {
+  console.log(post_number, " Posts added");
 });

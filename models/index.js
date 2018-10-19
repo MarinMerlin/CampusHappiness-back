@@ -16,6 +16,9 @@ const thematiqueConstructor = require('./constructor/thematique');
 const commentaireConstructor = require('./constructor/commentaire');
 const keywordConstructor = require('./constructor/keyword');
 const groupConstructor = require('./constructor/group');
+const choiceConstructor = require('./constructor/choice');
+const postConstructor = require('./constructor/post');
+
 
 // sequelize connection
 const sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -42,6 +45,8 @@ const Thematique = thematiqueConstructor(sequelize);
 const Commentaire = commentaireConstructor(sequelize);
 const Keyword = keywordConstructor(sequelize);
 const Group = groupConstructor(sequelize);
+const Choice = choiceConstructor(sequelize);
+const Post = postConstructor(sequelize);
 
 // // Foreign keys
 Question.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
@@ -55,6 +60,7 @@ Remplissage.belongsTo(User, { foreignKey: 'user_id', targetKey: 'id' });
 Question.belongsTo(Thematique, { foreignKey: 'thematique_id', targetKey: 'id' });
 Commentaire.belongsTo(Thematique, { foreignKey: 'thematique_id', targetKey: 'id' });
 Commentaire.belongsTo(Remplissage, { foreignKey: 'remplissage_id', targetKey: 'id' });
+Choice.belongsTo(Question, { foreignKey: 'question_id', targetKey: 'id' });
 
 // Should change this function by using promises more
 User.prototype.getSondage = function () {
@@ -706,6 +712,7 @@ const Models = {
   Commentaire: Commentaire,
   Keyword: Keyword,
   Group: Group,
+  Post: Post,
 };
 
 module.exports = Models;
