@@ -15,11 +15,15 @@ const postConstructor = function (sequelize) {
     },
     text: {
       allowNull: false,
-      type: Sequelize.STRING,
+      type: Sequelize.TEXT,
     },
     imageURL: {
       allowNull: false,
       type: Sequelize.STRING,
+    },
+    linkURL: {
+      allowNull: true,
+      type: Sequelize.TEXT,
     },
   }, {
     timestamps: false,
@@ -36,6 +40,7 @@ const postConstructor = function (sequelize) {
           title: post.title,
           text: post.text,
           imageURL: post.imageURL,
+          linkURL: post.linkURL,
         }).then(() => {
           resolve();
         });

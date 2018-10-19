@@ -259,7 +259,8 @@ clearTables().then(() => {
 const post_number = 6;
 const fake_post = {
   title: "Good News !",
-  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  text: "Et quia Montius inter dilancinantium manus spiritum efflaturus Epigonum et Eusebium nec professionem nec dignitatem ostendens aliquotiens increpabat, qui sint hi magna quaerebatur industria, et nequid intepesceret, Epigonus e Lycia philosophus ducitur et Eusebius ab Emissa Pittacas cognomento, concitatus orator, cum quaestor non hos sed tribunos fabricarum insimulasset promittentes armorum si novas res agitari conperissent.",
+  linkURL: 'https://fr.wikipedia.org/wiki/Vincent_Martin',
 };
 
 console.log("Adding posts ...");
