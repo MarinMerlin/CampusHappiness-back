@@ -16,7 +16,7 @@ const scheduler = function () {
             const token = data.generateJwt(sondage_id);
             const diff = Date.now() - data.dataValues.lastMailDate;
             if (data.dataValues.mailIntensity < diff / (1000 * 60 * 60 * 24) + 0.4) {
-              mailer(data.dataValues, token);
+              // mailer(data.dataValues, token);
               Models.User.update(
                 { lastMailDate: Date.now() },
                 { where: { id: data.dataValues.id } },

@@ -16,6 +16,8 @@ const thematiqueConstructor = require('./constructor/thematique');
 const commentaireConstructor = require('./constructor/commentaire');
 const keywordConstructor = require('./constructor/keyword');
 const choiceConstructor = require('./constructor/choice');
+const postConstructor = require('./constructor/post');
+
 
 // sequelize connection
 const sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -42,6 +44,7 @@ const Thematique = thematiqueConstructor(sequelize);
 const Commentaire = commentaireConstructor(sequelize);
 const Keyword = keywordConstructor(sequelize);
 const Choice = choiceConstructor(sequelize);
+const Post = postConstructor(sequelize);
 
 // // Foreign keys
 Question.belongsTo(Sondage, { foreignKey: 'sondage_id', targetKey: 'id' });
@@ -670,6 +673,7 @@ const Models = {
   Thematique: Thematique,
   Commentaire: Commentaire,
   Keyword: Keyword,
+  Post: Post,
 };
 
 module.exports = Models;

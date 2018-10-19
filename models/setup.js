@@ -1,8 +1,19 @@
 const Models = require("./index");
 
 const { 
-  Sondage, Thematique, User, Reponse, Question, Remplissage, JourSondage, Commentaire,
+  Sondage, 
+  Thematique, 
+  User, 
+  Reponse, 
+  Question, 
+  Remplissage, 
+  JourSondage, 
+  Commentaire, 
+  Post, 
 } = Models;
+
+
+Post.sync({ force: true }).then(() => { console.log("sync true $$$$$$$"); });
 
 const creationTable = function () {
   return new Promise(function (resolveAll) {

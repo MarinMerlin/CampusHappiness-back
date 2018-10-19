@@ -16,17 +16,17 @@ const Models = require('../models/index');
 
 router.use(morgan('dev'));
 
-router.use((req, res, next) => {
-  if (req.url === '/login') {
-    next();
-  } else if (!req.isAuthenticated()) {
-    res.status(401).json({ message: 'Not logged in' });
-  } else if (req.user.auth !== 1) {
-    res.status(401).json({ message: 'Not authorized' });
-  } else {
-    next();
-  }
-});
+// router.use((req, res, next) => {
+//   if (req.url === '/login') {
+//     next();
+//   } else if (!req.isAuthenticated()) {
+//     res.status(401).json({ message: 'Not logged in' });
+//   } else if (req.user.auth !== 1) {
+//     res.status(401).json({ message: 'Not authorized' });
+//   } else {
+//     next();
+//   }
+// });
 
 // --------- Routes protegées par token -------------
 
@@ -159,7 +159,6 @@ router.get("/getKeywords", (req, res) => {
 });
 
 router.post("/addKeyWord", (req, res) => {
-  console.log(req.body);
   Models.Keyword.addKeyword(req.body.name).then(() => {
     Models.Keyword.findAll().then((keywords) => {
       const keywordList = [];
@@ -168,6 +167,19 @@ router.post("/addKeyWord", (req, res) => {
       });
       res.status(200).json(keywordList);
     });
+  });
+});
+
+router.get("/getPosts", (req, res) => {
+  Models.Post.findAll().then((posts) => {
+    res.json(posts);
+  });
+});
+
+router.post("/addPost", (req, res) => {
+  Models.Post.addPost(req.body.post);
+  res.json({
+    success: true,
   });
 });
 
