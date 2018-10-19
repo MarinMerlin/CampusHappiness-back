@@ -35,7 +35,13 @@ var thematiqueConstructor = require('./constructor/thematique');
 
 var commentaireConstructor = require('./constructor/commentaire');
 
-var keywordConstructor = require('./constructor/keyword'); // sequelize connection
+var keywordConstructor = require('./constructor/keyword');
+
+var groupConstructor = require('./constructor/group');
+
+var choiceConstructor = require('./constructor/choice');
+
+var postConstructor = require('./constructor/post'); // sequelize connection
 
 
 var sequelize = new Sequelize(env.database, env.username, env.password, {
@@ -59,7 +65,10 @@ var Reponse = reponseConstructor(sequelize);
 var Sondage = sondageConstructor(sequelize);
 var Thematique = thematiqueConstructor(sequelize);
 var Commentaire = commentaireConstructor(sequelize);
-var Keyword = keywordConstructor(sequelize); // // Foreign keys
+var Keyword = keywordConstructor(sequelize);
+var Group = groupConstructor(sequelize);
+var Choice = choiceConstructor(sequelize);
+var Post = postConstructor(sequelize); // // Foreign keys
 
 Question.belongsTo(Sondage, {
   foreignKey: 'sondage_id',
@@ -67,6 +76,14 @@ Question.belongsTo(Sondage, {
 });
 JourSondage.belongsTo(Sondage, {
   foreignKey: 'sondage_id',
+  targetKey: 'id'
+});
+Group.belongsTo(Sondage, {
+  foreignKey: 'sondage_id',
+  targetKey: 'id'
+});
+User.belongsTo(Group, {
+  foreignKey: 'group_id',
   targetKey: 'id'
 });
 Reponse.belongsTo(Question, {
@@ -95,6 +112,10 @@ Commentaire.belongsTo(Thematique, {
 });
 Commentaire.belongsTo(Remplissage, {
   foreignKey: 'remplissage_id',
+  targetKey: 'id'
+});
+Choice.belongsTo(Question, {
+  foreignKey: 'question_id',
   targetKey: 'id'
 }); // Should change this function by using promises more
 
@@ -135,12 +156,26 @@ User.prototype.getSondage = function () {
           sondageList.push({
             id: sondage.dataValues.id,
             name: sondage.dataValues.name,
-            thematiqueList: thematiqueList,
-            current: sondage.dataValues.current
+            thematiqueList: thematiqueList
           });
         });
         resolve(sondageList);
       });
+    });
+  });
+};
+
+User.prototype.getGroups = function () {
+  return new Promise(function (resolve) {
+    var groupList = [];
+    Group.findAll().then(function (groups) {
+      groups.forEach(function (group) {
+        groupList.push({
+          id: group.dataValues.id,
+          name: group.dataValues.name
+        });
+      });
+      resolve(groupList);
     });
   });
 };
@@ -176,6 +211,33 @@ User.prototype.createSondage = function (sondage) {
         });
         Promise.all(promises).then(function () {
           resolve(sondage_id);
+        });
+      });
+    });
+  });
+};
+
+User.prototype.updateSondage = function (sondage, id) {
+  return new Promise(function (resolve) {
+    Sondage.findOne({
+      where: {
+        id: id
+      }
+    }).then(function () {
+      var promises = [];
+      sondage.thematiqueList.forEach(function (thematique) {
+        promises.push(Thematique.addThematique(thematique.name));
+      });
+      Promise.all(promises).then(function (thematiqueListWithId) {
+        addThematiqueId(sondage.thematiqueList, thematiqueListWithId);
+        promises = [];
+        sondage.thematiqueList.forEach(function (thematique) {
+          thematique.questionList.forEach(function (question) {
+            promises.push(Question.addQuestion(id, thematique.id, question.text, question.keyWord));
+          });
+        });
+        Promise.all(promises).then(function () {
+          resolve(id);
         });
       });
     });
@@ -754,7 +816,7 @@ User.prototype.answerSondage = function (sondage, simulationDate) {
   });
 };
 
-User.prototype.updateSondage = function (sondage) {
+User.prototype.updateAnswer = function (sondage) {
   return new Promise(function (resolve) {
     var remplissage_id = sondage.remplissage_id;
     sondage.answered_questions.forEach(function (question) {
@@ -794,7 +856,9 @@ var Models = {
   Reponse: Reponse,
   Thematique: Thematique,
   Commentaire: Commentaire,
-  Keyword: Keyword
+  Keyword: Keyword,
+  Group: Group,
+  Post: Post
 };
 module.exports = Models;
 //# sourceMappingURL=index.js.map

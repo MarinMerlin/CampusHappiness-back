@@ -42,7 +42,7 @@ router.post('/answerSondage',
             answered_questions: req.body.answered_questions,
             answered_commentaires: req.body.answered_commentaires,
           };
-          user.updateSondage(sondage).then(() => {
+          user.updateAnswer(sondage).then(() => {
             console.log(req.user.firstName, " already answered and changed his answers");
             res.status(200).send({ msg: "Merci d'avoir modifier votre reponse !" });
           });

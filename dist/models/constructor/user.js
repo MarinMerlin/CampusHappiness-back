@@ -1,5 +1,9 @@
 "use strict";
 
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var Sequelize = require('sequelize');
 
 var crypto = require('crypto');
@@ -9,6 +13,8 @@ var jwt = require('jsonwebtoken');
 var id_generator = require('../../custom_module/id_generator');
 
 var env = require("../../const");
+
+var accountCreationMail = require('../../mail/accountCreation');
 
 var userConstructor = function userConstructor(sequelize) {
   var User = sequelize.define('user', {
@@ -49,13 +55,16 @@ var userConstructor = function userConstructor(sequelize) {
     },
     mailIntensity: {
       type: Sequelize.INTEGER
+    },
+    group_id: {
+      type: Sequelize.STRING
     }
   }, {
     timestamps: false
   }); // Class Methods
 
   User.addUser = function (firstName, lastName, email, pseudo, password, auth) {
-    var photo = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '/user/photo/default.jpg';
+    var group_id = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : env.default_group;
     return new Promise(function (resolve) {
       var generatedID = id_generator();
       var salt = crypto.randomBytes(16).toString('hex');
@@ -69,10 +78,14 @@ var userConstructor = function userConstructor(sequelize) {
           auth: auth,
           salt: salt,
           hash: crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex'),
-          photo: photo,
+          photo: '/user/photo/default.jpg',
           mailIntensity: 1,
+          group_id: group_id,
           lastMailDate: Date.now() - 86400000
-        }).then(function () {
+        }).then(function (user) {
+          accountCreationMail(_objectSpread({}, user.dataValues, {
+            password: password
+          }));
           resolve();
         });
       });

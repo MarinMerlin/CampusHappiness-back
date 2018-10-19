@@ -16,22 +16,18 @@ var morgan = require('morgan'); // Récupère les models
 
 var Models = require('../models/index');
 
-router.use(morgan('dev'));
-router.use(function (req, res, next) {
-  if (req.url === '/login') {
-    next();
-  } else if (!req.isAuthenticated()) {
-    res.status(401).json({
-      message: 'Not logged in'
-    });
-  } else if (req.user.auth !== 1) {
-    res.status(401).json({
-      message: 'Not authorized'
-    });
-  } else {
-    next();
-  }
-}); // --------- Routes protegées par token -------------
+router.use(morgan('dev')); // router.use((req, res, next) => {
+//   if (req.url === '/login') {
+//     next();
+//   } else if (!req.isAuthenticated()) {
+//     res.status(401).json({ message: 'Not logged in' });
+//   } else if (req.user.auth !== 1) {
+//     res.status(401).json({ message: 'Not authorized' });
+//   } else {
+//     next();
+//   }
+// });
+// --------- Routes protegées par token -------------
 // Un administrateur peut ajouter un autre administrateur :
 // Les attributs de l'admin sont dans le body de la requète
 // TODO : Prendre en compte le cas où il y a une erreure au cours de la création de l'admin'
@@ -50,18 +46,79 @@ router.use(function (req, res, next) {
     });
   }
 }); */
+// firstName, lastName, email, pseudo, password, auth, photo
 
-router.post('/csvPost', function (req, res) {
+router.post('/postUsers', function (req, res) {
   var promises = [];
   req.body.userList.forEach(function (user) {
-    promises.push(Models.User.addUser(user.firstName, user.lastName, user.email));
+    var authValue = 0;
+
+    if (user.admin) {
+      authValue = 1;
+    }
+
+    promises.push(Models.User.addUser(user.firstName, user.lastName, user.email, user.pseudo, user.password, authValue));
   });
-  Promise.all(promises).then(res.status(200).json("User list added"));
+  Promise.all(promises).then(res.status(200).json({
+    success: true
+  }));
 });
-router.post('/singlePost', function (req, res) {
-  Models.User.addUser(req.body.firstName, req.body.lastName, req.body.email, req.body.pseudo, req.body.password, req.body.auth).then(function () {
-    res.status(200).send("New user added");
-    console.log("New user added: ", req.body.pseudo);
+router.get('/getUsers', function (req, res) {
+  Models.User.findAll().then(function (allUserData) {
+    var userArray = [];
+    allUserData.forEach(function (user) {
+      var _user$dataValues = user.dataValues,
+          firstName = _user$dataValues.firstName,
+          lastName = _user$dataValues.lastName,
+          email = _user$dataValues.email,
+          pseudo = _user$dataValues.pseudo,
+          id = _user$dataValues.id,
+          group_id = _user$dataValues.group_id;
+      userArray.push({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        pseudo: pseudo,
+        id: id,
+        group_id: group_id
+      });
+    });
+    res.json(userArray);
+  });
+});
+router.post('/postGroup', function (req, res) {
+  Models.Sondage.findOne().then(function (sondage) {
+    Models.Group.addGroup(sondage.dataValues.id, req.body.groupName).then(function () {
+      res.status(200).json({
+        success: true
+      });
+    });
+  });
+});
+router.post('/changeUserGroup', function (req, res) {
+  var promises = [];
+  req.body.selectedUsers.forEach(function (user) {
+    var promise = new Promise(function (resolve) {
+      if (user.check) {
+        Models.User.update({
+          group_id: req.body.selectedGroup.id
+        }, {
+          where: {
+            id: user.id
+          }
+        }).then(function () {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+    promises.push(promise);
+  });
+  Promise.all(promises).then(function () {
+    res.status(200).json({
+      success: true
+    });
   });
 }); // Route relative à l'affichage et la creation de sondage
 
@@ -77,25 +134,18 @@ router.get('/getSondage', function (req, res) {
     });
   });
 });
-/* Survey object sent from the front to /postSondage
-  {
-    name: sondagename,
-    thematiqueList: [
-      {
-        name: thematiquename,
-        questionList: [
-          {
-            keyWord: motclef,
-            question: question,
-          },
-          { ... },
-        ]
-      },
-      { ... },
-    ]
-  }
-*/
-
+router.get('/getGroups', function (req, res) {
+  Models.User.findOne({
+    where: {
+      id: req.user.id
+    }
+  }).then(function (user) {
+    user.getGroups().then(function (groupList) {
+      console.log("Sent all groups to client");
+      res.status(200).json(groupList);
+    });
+  });
+});
 router.post('/postSondage', function (req, res) {
   Models.User.findOne({
     where: {
@@ -114,23 +164,15 @@ router.post('/changeNextSondage', function (req, res) {
     console.log("/!\\ ERROR : Inccorect body");
     res.status(400).send("Bad Request : The body doesnt contain next_sondage ! ");
   } else {
-    Models.Sondage.update({
-      current: false
+    Models.Group.update({
+      sondage_id: req.body.sondage_id
     }, {
       where: {
-        current: true
+        id: req.body.group_id
       }
     }).then(function () {
-      Models.Sondage.update({
-        current: true
-      }, {
-        where: {
-          id: req.body.id
-        }
-      }).then(function (sondage) {
-        console.log("Changed the sondage to sondage: ", req.body.name);
-        res.status(200).json(sondage.dataValues);
-      });
+      console.log("Changed the sondage to sondage: ", req.body.sondage_id, " for the group: ", req.body.sondage_id);
+      res.status(200).json("Changed the sondage to sondage: ".concat(req.body.sondage_name, " for the group: ").concat(req.body.sondage_name));
     });
   }
 }); // Route relative aux statisques
@@ -156,7 +198,8 @@ router.get("/specificStatistics/:year/:month/:day", function (req, res) {
       res.json(sondageResult);
     });
   });
-});
+}); // Route relative aux aux mot clef
+
 router.get("/getKeywords", function (req, res) {
   Models.Keyword.findAll().then(function (keywords) {
     var keywordList = [];
@@ -167,7 +210,6 @@ router.get("/getKeywords", function (req, res) {
   });
 });
 router.post("/addKeyWord", function (req, res) {
-  console.log(req.body);
   Models.Keyword.addKeyword(req.body.name).then(function () {
     Models.Keyword.findAll().then(function (keywords) {
       var keywordList = [];
@@ -176,6 +218,18 @@ router.post("/addKeyWord", function (req, res) {
       });
       res.status(200).json(keywordList);
     });
+  });
+}); // Route relative aux posts
+
+router.get("/getPosts", function (req, res) {
+  Models.Post.findAll().then(function (posts) {
+    res.json(posts);
+  });
+});
+router.post("/addPost", function (req, res) {
+  Models.Post.addPost(req.body.post);
+  res.json({
+    success: true
   });
 });
 module.exports = router;

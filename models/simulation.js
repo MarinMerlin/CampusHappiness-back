@@ -1,9 +1,10 @@
 const Models = require("./index");
 const id_generator = require('../custom_module/id_generator');
 const clearTables = require('./setup');
+const env = require("../const");
 
 const { 
-  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Post,
+  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group, Post,
 } = Models;
 
 const simulationTime = 35;
@@ -190,17 +191,21 @@ const answerAll = function () {
 
 const firstDay = function () {
   return new Promise(function (resolve) {
-    User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(() => {
-      addManyUsers(10).then(() => {
-        User.findOne({ where: { pseudo: 'Admin' } }).then((user) => {
-          user.createSondage(fakeSurvey).then((sondage_id) => {
-            Sondage.update({ current: true }, { where: { id: sondage_id } });
-            Keyword.addKeyword("Qualité");
-            getQuestionIdList(sondage_id).then(() => {
-              answerAll().then(() => { 
-                incrementDay();
-                resolve(); 
-              }); 
+    const sondage_id = id_generator();
+    Sondage.addSondage(sondage_id, 'Admin', Date.now(), fakeSurvey.name).then(() => {
+      Group.addGroup(sondage_id, 'default', env.default_group).then(() => {
+        User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(() => {
+          addManyUsers(10).then(() => {
+            User.findOne({ where: { pseudo: 'Admin' } }).then((user) => {
+              user.updateSondage(fakeSurvey, sondage_id).then(() => {
+                Keyword.addKeyword("Qualité");
+                getQuestionIdList(sondage_id).then(() => {
+                  answerAll().then(() => { 
+                    incrementDay();
+                    resolve(); 
+                  }); 
+                });
+              });
             });
           });
         });

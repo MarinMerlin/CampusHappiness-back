@@ -53,30 +53,33 @@ router.post('/updatePhoto', function (req, res) {
         }
       }).then(function () {
         res.status(200).json({
-          photo: "/user/photo/".concat(req.user.pseudo)
+          photo: "/user/photo/".concat(req.user.pseudo, ".jpg")
         });
       });
     }
   });
 });
 router.get('/getToken', function (req, res) {
-  Models.Sondage.findOne({
+  Models.User.findOne({
+    include: [{
+      model: Models.Group
+    }],
     where: {
-      current: true
+      id: req.user.id
     }
-  }).then(function (sondage) {
-    Models.Remplissage.findOne({
+  }).then(function (user) {
+    Models.Sondage.findOne({
       where: {
-        user_id: req.user.id,
-        date: Date.now(),
-        sondage_id: sondage.dataValues.id
+        id: user.dataValues.group.dataValues.sondage_id
       }
-    }).then(function (remplissage) {
-      Models.User.findOne({
+    }).then(function (sondage) {
+      Models.Remplissage.findOne({
         where: {
-          id: req.user.id
+          user_id: req.user.id,
+          date: Date.now(),
+          sondage_id: sondage.dataValues.id
         }
-      }).then(function (user) {
+      }).then(function (remplissage) {
         var sondage_id = sondage.dataValues.id;
         var token;
         var alreadyAnswered = false;

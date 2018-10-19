@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const id_generator = require('../../custom_module/id_generator');
 const env = require("../../const");
+const accountCreationMail = require('../../mail/accountCreation');
 
 const userConstructor = function (sequelize) {
   const User = sequelize.define('user', {
@@ -44,12 +45,15 @@ const userConstructor = function (sequelize) {
     mailIntensity: {
       type: Sequelize.INTEGER,
     },
+    group_id: {
+      type: Sequelize.STRING,
+    },
   }, {
     timestamps: false,
   });
 
   // Class Methods
-  User.addUser = function (firstName, lastName, email, pseudo, password, auth, photo = '/user/photo/default.jpg') {
+  User.addUser = function (firstName, lastName, email, pseudo, password, auth, group_id = env.default_group) {
     return new Promise(function (resolve) {
       const generatedID = id_generator();
       const salt = crypto.randomBytes(16).toString('hex');
@@ -63,10 +67,15 @@ const userConstructor = function (sequelize) {
           auth,
           salt,
           hash: crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex'),
-          photo,
+          photo: '/user/photo/default.jpg',
           mailIntensity: 1,
+          group_id: group_id,
           lastMailDate: Date.now() - 86400000,
-        }).then(() => {
+        }).then((user) => {
+          accountCreationMail({
+            ...user.dataValues,
+            password: password,
+          });
           resolve();
         });
       });

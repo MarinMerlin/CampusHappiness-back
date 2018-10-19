@@ -9,6 +9,8 @@ const {
   Remplissage, 
   JourSondage, 
   Commentaire, 
+  Keyword, 
+  Group,
   Post, 
 } = Models;
 
@@ -17,79 +19,94 @@ Post.sync({ force: true }).then(() => { console.log("sync true $$$$$$$"); });
 
 const creationTable = function () {
   return new Promise(function (resolveAll) {
-    User.sync({ force: true }).then(() => {
-      User.create({
-        id: "fake_user_id",
-        firstName: "fake_first_name",
-        lastName: "fake_last_name",
-        email: "fake_user_email@fake_mail.bite",
-        pseudo: "fake_pseudo",
-        salt: "fake_salt",
-        hash: "fake_hash",
-        auth: 0,
-        photo: "./public/user/photo/default.jpg",
-        lastMailDate: Date.now(),
-        mailIntensity: 1,
+    Sondage.sync({ force: true }).then(() => {
+      Sondage.create({
+        id: "fake_sondage_id",
+        author: "fake_author",
+        createdAt: Date.now(),
+        name: "fake_name",
       });
     }).then(() => {
-      Sondage.sync({ force: true }).then(() => {
-        Sondage.create({
-          id: "fake_sondage_id",
-          author: "fake_author",
-          createdAt: Date.now(),
-          name: "fake_name",
-          current: true,
+      Group.sync({ force: true }).then(() => {
+        Group.create({
+          id: "fake_group_id",
+          name: "fake_group_name",
+          sondage_id: "fake_sondage_id",
         });
       }).then(() => {
-        JourSondage.sync({ force: true }).then(() => {
-          JourSondage.create({
-            id: "fake_jour_sondage_id",
-            sondage_id: "fake_sondage_id",
-            date_emmission: Date.now(),
-            nombre_emission: 1,
-          });
-        });
-        Thematique.sync({ force: true }).then(() => {
-          Thematique.create({
-            id: "fake_thematique_id",
-            name: "fake_name",
+        User.sync({ force: true }).then(() => {
+          User.create({
+            id: "fake_user_id",
+            firstName: "fake_first_name",
+            lastName: "fake_last_name",
+            email: "fake_user_email@fake_mail.bite",
+            pseudo: "fake_pseudo",
+            salt: "fake_salt",
+            hash: "fake_hash",
+            auth: 0,
+            photo: "./public/user/photo/default.jpg",
+            lastMailDate: Date.now(),
+            mailIntensity: 1,
+            group_id: 'fake_group_id',
           });
         }).then(() => {
-          Question.sync({ force: true }).then(() => {
-            Question.create({
-              id: "fake_question_id",
+          JourSondage.sync({ force: true }).then(() => {
+            JourSondage.create({
+              id: "fake_jour_sondage_id",
               sondage_id: "fake_sondage_id",
-              valeur: "fake_question",
-              thematique_id: "fake_thematique_id",
-              keyWord: "fake_keyWord",
+              date_emmission: Date.now(),
+              nombre_emission: 1,
+            });
+          });
+          Thematique.sync({ force: true }).then(() => {
+            Thematique.create({
+              id: "fake_thematique_id",
+              name: "fake_name",
             });
           }).then(() => {
-            Remplissage.sync({ force: true }).then(() => {
-              Remplissage.create({
-                id: "fake_remplissage_id",
+            Question.sync({ force: true }).then(() => {
+              Question.create({
+                id: "fake_question_id",
                 sondage_id: "fake_sondage_id",
-                user_id: "fake_user_id",
-                date: Date.now(),
+                valeur: "fake_question",
+                thematique_id: "fake_thematique_id",
+                keyWord: "fake_keyWord",
               });
             }).then(() => {
-              Commentaire.sync({ force: true }).then(() => {
-                Commentaire.create({
-                  id: "fake_commentaire_id",
-                  remplissage_id: "fake_remplissage_id",
-                  thematique_id: "fake_thematique_id",
-                  commentaire: "fake_commentaire",
+              Remplissage.sync({ force: true }).then(() => {
+                Remplissage.create({
+                  id: "fake_remplissage_id",
+                  sondage_id: "fake_sondage_id",
+                  user_id: "fake_user_id",
+                  date: Date.now(),
                 });
               }).then(() => {
-                Reponse.sync({ force: true }).then(() => {
-                  Reponse.create({
-                    id: "fake_reponse_id",
+                Commentaire.sync({ force: true }).then(() => {
+                  Commentaire.create({
+                    id: "fake_commentaire_id",
                     remplissage_id: "fake_remplissage_id",
-                    question_id: "fake_question_id",
-                    valeur: 0,
+                    thematique_id: "fake_thematique_id",
+                    commentaire: "fake_commentaire",
                   });
                 }).then(() => {
-                  console.log("tables créées");
-                  resolveAll();
+                  Reponse.sync({ force: true }).then(() => {
+                    Reponse.create({
+                      id: "fake_reponse_id",
+                      remplissage_id: "fake_remplissage_id",
+                      question_id: "fake_question_id",
+                      valeur: 0,
+                    });
+                  }).then(() => {
+                    Keyword.sync({ force: true }).then(() => {
+                      Keyword.create({
+                        id: "fake_keyword_id",
+                        name: "fake_keyword_name",
+                      });
+                    }).then(() => {
+                      console.log("tables créées");
+                      resolveAll();
+                    });
+                  });
                 });
               });
             });
@@ -119,8 +136,14 @@ const suppressionTables = function () {
         resolve();
       });
     });
+
+    const keywordDel = new Promise(function (resolve) {
+      Keyword.drop().then(() => {
+        resolve();
+      });
+    });
       
-    Promise.all([commentaireDel, reponseDel, jourSondageDel]).then(() => {
+    Promise.all([commentaireDel, reponseDel, jourSondageDel, keywordDel]).then(() => {
       const questionDel = new Promise(function (resolve) {
         Question.drop().then(() => {
           resolve();
@@ -143,9 +166,11 @@ const suppressionTables = function () {
           });
         });
         Promise.all([thematiqueDel, userDel]).then(() => {
-          Sondage.drop().then(() => {
-            console.log(" -- anciennes tables supprimées --");
-            resolveAll();
+          Group.drop().then(() => {
+            Sondage.drop().then(() => {
+              console.log(" -- anciennes tables supprimées --");
+              resolveAll();
+            });
           });
         });
       });
@@ -166,6 +191,14 @@ const setupTables = function () {
 const delReponse = function () {
   return new Promise(function (resolve) {
     Reponse.findOne().then((elem) => {
+      elem.destroy().then(resolve);
+    });
+  });
+};
+
+const delKeyword = function () {
+  return new Promise(function (resolve) {
+    Keyword.findOne().then((elem) => {
       elem.destroy().then(resolve);
     });
   });
@@ -225,19 +258,31 @@ const delUser = function () {
   });
 };
 
+const delGroup = function () {
+  return new Promise(function (resolve) {
+    Group.findOne().then((elem) => {
+      elem.destroy().then(resolve);
+    });
+  });
+};
+
 const clearTable = function () {
   return new Promise(function (resolve) {
     setupTables().then(() => {
       let promises = [];
-      promises.push(delReponse(), delCommentaire(), delJourSondage());
+      promises.push(delReponse(), delCommentaire(), delJourSondage(), delKeyword());
       Promise.all(promises).then(() => {
         promises = [delQuestion(), delRemplissage()];
         Promise.all(promises).then(() => {
-          promises = [delThematique(), delSondage()];
+          promises = [delUser()];
           Promise.all(promises).then(() => {
-            delUser().then(() => {
-              console.log("Tables nettoyées");
-              resolve();
+            promises = [delGroup()];
+            Promise.all(promises).then(() => {
+              promises = [delThematique(), delSondage()];
+              Promise.all(promises).then(() => {
+                console.log("Tables nettoyées");
+                resolve();
+              });
             });
           });
         });
