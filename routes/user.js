@@ -7,6 +7,9 @@ const fs = require('fs');
 // Le body Parser permet d'acceder aux variable envoyés dans le body
 const bodyParser = require('body-parser');
 
+
+//  De base le poid maximum des données est de 100 kb,
+// On conserve cette limite, le front doit vérifier en amont
 router.use(bodyParser.json());
 router.use(express.urlencoded({ extended: false }));
 
@@ -39,15 +42,35 @@ router.post('/updateUser', (req, res) => {
 
 router.post('/updatePhoto', (req, res) => {
   const base64Data = req.body.photo.replace(/^data:image\/jpeg;base64,/, "");
-  fs.writeFile(`./public/user/photo/${req.user.pseudo}.jpg`, base64Data, 'base64', (err) => {
+
+  // Supression de l'ancienne photo
+  Models.User.findById(req.user.id)
+    .then((user) => {
+      if (user.dataValues.photo !== "/user/photo/default.jpg") {
+        fs.unlink(`./public${user.dataValues.photo}`, (error) => {
+          if (error) { 
+            console.log("erreur au cours de la supression de la photo, erreur", error); 
+          } else { 
+            console.log(`Photo ${user.dataValues.photo} supprimée !`); 
+          }
+        });
+      }
+    });
+  
+  const date = Date.now();
+  fs.writeFile(`./public/user/photo/${req.user.pseudo}-${date}.jpg`, base64Data, 'base64', (err) => {
     if (err) { 
       console.log(err);
     } else {
+      const newCookie = Object.assign(req.user, { photo: `/user/photo/${req.user.pseudo}-${date}.jpg` });
+      req.login(newCookie, () => {
+        console.log("Modified cookie: ", newCookie);
+      });
       Models.User.update(
-        { photo: `/user/photo/${req.user.pseudo}.jpg` },
+        { photo: `/user/photo/${req.user.pseudo}-${date}.jpg` },
         { where: { id: req.user.id } },
       ).then(() => {
-        res.status(200).json({ photo: `/user/photo/${req.user.pseudo}.jpg` });
+        res.status(200).json({ photo: `/user/photo/${req.user.pseudo}-${date}.jpg` });
       });
     }
   });
