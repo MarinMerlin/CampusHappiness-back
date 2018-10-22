@@ -29,22 +29,6 @@ router.use(morgan('dev'));
 
 // --------- Routes protegées par token -------------
 
-// Un administrateur peut ajouter un autre administrateur :
-// Les attributs de l'admin sont dans le body de la requète
-// TODO : Prendre en compte le cas où il y a une erreure au cours de la création de l'admin'
-
-// Routes relatives a la gestion des admins et des users
-/* router.post('/createAdmin', (req, res) => {
-  // On vérifie que les données minmums pour créer un utilisateur sont bien présentes
-  if (!req.body.pseudo || !req.body.mp) {
-    res.status(400).send("Bad Request : The body of the create admin request doesnt contain pseudo or mp ! ");
-  } else {
-    Models.Admin.addAdmin(req.body.pseudo, req.body.mp, Date.now()).then(() => {
-      res.status(200).send(`Admin ${req.body.pseudo} created`);
-    });
-  }
-}); */
-
 // firstName, lastName, email, pseudo, password, auth, photo
 router.post('/postUsers',
   (req, res) => {
@@ -63,7 +47,25 @@ router.post('/postUsers',
         authValue,
       ));
     });
-    Promise.all(promises).then(res.status(200).json({ success: true }));
+    Promise.all(promises).then(() => {
+      Models.User.findAll().then((allUserData) => {
+        const userArray = [];
+        allUserData.forEach((user) => {
+          const {
+            firstName, lastName, email, pseudo, id, group_id,
+          } = user.dataValues; 
+          userArray.push({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            pseudo: pseudo,
+            id: id,
+            group_id: group_id,
+          });
+        });
+        res.status(200).json({ userArray: userArray, success: true });
+      });
+    });
   });
 
 router.get('/getUsers', (req, res) => {
