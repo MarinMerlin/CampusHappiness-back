@@ -32,21 +32,6 @@ router.use(function (req, res, next) {
     next();
   }
 }); // --------- Routes protegées par token -------------
-// Un administrateur peut ajouter un autre administrateur :
-// Les attributs de l'admin sont dans le body de la requète
-// TODO : Prendre en compte le cas où il y a une erreure au cours de la création de l'admin'
-// Routes relatives a la gestion des admins et des users
-
-/* router.post('/createAdmin', (req, res) => {
-  // On vérifie que les données minmums pour créer un utilisateur sont bien présentes
-  if (!req.body.pseudo || !req.body.mp) {
-    res.status(400).send("Bad Request : The body of the create admin request doesnt contain pseudo or mp ! ");
-  } else {
-    Models.Admin.addAdmin(req.body.pseudo, req.body.mp, Date.now()).then(() => {
-      res.status(200).send(`Admin ${req.body.pseudo} created`);
-    });
-  }
-}); */
 // firstName, lastName, email, pseudo, password, auth, photo
 
 router.post('/postUsers', function (req, res) {
@@ -60,21 +45,44 @@ router.post('/postUsers', function (req, res) {
 
     promises.push(Models.User.addUser(user.firstName, user.lastName, user.email, user.pseudo, user.password, authValue));
   });
-  Promise.all(promises).then(res.status(200).json({
-    success: true
-  }));
+  Promise.all(promises).then(function () {
+    Models.User.findAll().then(function (allUserData) {
+      var userArray = [];
+      allUserData.forEach(function (user) {
+        var _user$dataValues = user.dataValues,
+            firstName = _user$dataValues.firstName,
+            lastName = _user$dataValues.lastName,
+            email = _user$dataValues.email,
+            pseudo = _user$dataValues.pseudo,
+            id = _user$dataValues.id,
+            group_id = _user$dataValues.group_id;
+        userArray.push({
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          pseudo: pseudo,
+          id: id,
+          group_id: group_id
+        });
+      });
+      res.status(200).json({
+        userArray: userArray,
+        success: true
+      });
+    });
+  });
 });
 router.get('/getUsers', function (req, res) {
   Models.User.findAll().then(function (allUserData) {
     var userArray = [];
     allUserData.forEach(function (user) {
-      var _user$dataValues = user.dataValues,
-          firstName = _user$dataValues.firstName,
-          lastName = _user$dataValues.lastName,
-          email = _user$dataValues.email,
-          pseudo = _user$dataValues.pseudo,
-          id = _user$dataValues.id,
-          group_id = _user$dataValues.group_id;
+      var _user$dataValues2 = user.dataValues,
+          firstName = _user$dataValues2.firstName,
+          lastName = _user$dataValues2.lastName,
+          email = _user$dataValues2.email,
+          pseudo = _user$dataValues2.pseudo,
+          id = _user$dataValues2.id,
+          group_id = _user$dataValues2.group_id;
       userArray.push({
         firstName: firstName,
         lastName: lastName,
@@ -192,7 +200,6 @@ router.get("/generalStatistics", function (req, res) {
 });
 router.get("/specificStatistics/:year/:month/:day/:group", function (req, res) {
   Models.User.findById(req.user.id).then(function (user) {
-    console.log(req.params);
     user.getStatisticsSpecific(req.params).then(function (sondageResult) {
       res.json(sondageResult);
     });
@@ -220,11 +227,6 @@ router.post("/addKeyWord", function (req, res) {
   });
 }); // Route relative aux posts
 
-router.get("/getPosts", function (req, res) {
-  Models.Post.findAll().then(function (posts) {
-    res.json(posts);
-  });
-});
 router.post("/addPost", function (req, res) {
   Models.Post.addPost(req.body.post);
   res.json({

@@ -14,33 +14,33 @@ simulationDay.setDate(simulationDay.getDate() - simulationTime);
 const groupIds = [id_generator(), id_generator()];
 const sondageIds = [id_generator(), id_generator()];
 const fakeSurvey = {
-  name: 'Condition de travail',
+  name: 'Working conditions',
   thematiqueList: [
     {
-      name: 'Cafétaria',
+      name: 'Cafetaria',
       questionList: [
         {
-          text: 'Le repas était-il convenable?',
-          keyWord: 'Qualité',
+          text: 'Was the meal satisfactory?',
+          keyWord: 'Quality',
         },
         {
-          text: "Comment était l'attente?",
-          keyWord: 'Attente',
+          text: "How was the wait?",
+          keyWord: 'Wait',
         },
         {
-          text: 'Etait-ce trop bryuant?',
-          keyWord: 'Bruit',
+          text: 'Was it to noisy?',
+          keyWord: 'Noise',
         },
         {
-          text: 'Le prix convenait il?',
-          keyWord: 'Prix',
+          text: 'Was the price correct?',
+          keyWord: 'Price',
         },
         {
-          text: "Propreté de la cafeteria",
+          text: "Cleanliness of the cafetaria",
           keyWord: 'Propreté',
         },
         {
-          text: "Propreté des sanitaires",
+          text: "Cleanliness",
           keyWord: 'propreté',
         },
       ],
