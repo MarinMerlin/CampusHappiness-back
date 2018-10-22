@@ -15,17 +15,17 @@ const Models = require('../models/index');
 
 router.use(morgan('dev'));
 
-// router.use((req, res, next) => {
-//   if (req.url === '/login') {
-//     next();
-//   } else if (!req.isAuthenticated()) {
-//     res.status(401).json({ message: 'Not logged in' });
-//   } else if (req.user.auth !== 1) {
-//     res.status(401).json({ message: 'Not authorized' });
-//   } else {
-//     next();
-//   }
-// });
+router.use((req, res, next) => {
+  if (req.url === '/login') {
+    next();
+  } else if (!req.isAuthenticated()) {
+    res.status(401).json({ message: 'Not logged in' });
+  } else if (req.user.auth !== 1) {
+    res.status(401).json({ message: 'Not authorized' });
+  } else {
+    next();
+  }
+});
 
 // --------- Routes protegées par token -------------
 
@@ -205,12 +205,6 @@ router.post("/addKeyWord", (req, res) => {
 });
 
 // Route relative aux posts
-
-router.get("/getPosts", (req, res) => {
-  Models.Post.findAll().then((posts) => {
-    res.json(posts);
-  });
-});
 
 router.post("/addPost", (req, res) => {
   Models.Post.addPost(req.body.post);
