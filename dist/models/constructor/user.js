@@ -81,7 +81,7 @@ var userConstructor = function userConstructor(sequelize) {
           photo: '/user/photo/default.jpg',
           mailIntensity: 1,
           group_id: group_id,
-          lastMailDate: Date.now() - 86400000
+          lastMailDate: Date.now()
         }).then(function (user) {
           accountCreationMail(_objectSpread({}, user.dataValues, {
             password: password

@@ -110,4 +110,10 @@ router.get('/userStat', (req, res) => {
   });
 });
  
+router.get("/getPosts", (req, res) => {
+  Models.Post.findAll().then((posts) => {
+    res.json(posts);
+  });
+});
+
 module.exports = router;

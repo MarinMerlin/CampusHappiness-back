@@ -1,0 +1,89 @@
+"use strict";
+
+var userList = [{
+  firstName: "Jean",
+  lastName: "Michel",
+  pseudo: "Jean",
+  email: "jean.michel@supukec.fr",
+  password: "michel"
+}, {
+  firstName: "Charles",
+  lastName: "Henry",
+  pseudo: "Charles",
+  email: "charles.henry@supukec.fr",
+  password: "henry"
+}, {
+  firstName: "John",
+  lastName: "Michelangelo",
+  pseudo: "John",
+  email: "john.michelangelo@supukec.fr",
+  password: "michelangelo"
+}, {
+  firstName: "Martin",
+  lastName: "Mystère",
+  pseudo: "Martin",
+  email: "martin.mystere@supukec.fr",
+  password: "mystere"
+}, {
+  firstName: "Bob",
+  lastName: "Laiponje",
+  pseudo: "Bob",
+  email: "bob.laiponje@supukec.fr",
+  password: "laiponje"
+}, {
+  firstName: "Jacques",
+  lastName: "Adi",
+  pseudo: "Jacques",
+  email: "jacques.adi@supukec.fr",
+  password: "adi"
+}, {
+  firstName: "Jean",
+  lastName: "Michel",
+  pseudo: "Jean",
+  email: "jean.michel@supukec.fr",
+  password: "michel"
+}, {
+  firstName: "Goerge",
+  lastName: "Michaels",
+  pseudo: "Goerge",
+  email: "goerge.michaels@supukec.fr",
+  password: "michaels"
+}, {
+  firstName: "Merin",
+  lastName: "Marlin",
+  pseudo: "merin",
+  email: "merin.marlin@supukec.fr",
+  password: "marlin"
+}, {
+  firstName: "Marie",
+  lastName: "Jeanne",
+  pseudo: "Marie",
+  email: "marie.jeanne@supukec.fr",
+  password: "jeanne"
+}, {
+  firstName: "Claire",
+  lastName: "Dejager",
+  pseudo: "Claire",
+  email: "claire.dejager@supukec.fr",
+  password: "dejager"
+}, {
+  firstName: "Anne",
+  lastName: "Collins",
+  pseudo: "Anne",
+  email: "anne.collins@supukec.fr",
+  password: "anne"
+}, {
+  firstName: "Laure",
+  lastName: "Bailleul",
+  pseudo: "laure",
+  email: "laure.bailleul@supukec.fr",
+  password: "bailleul"
+}, {
+  firstName: "Camille",
+  lastName: "Oswald",
+  pseudo: "Camille",
+  email: "camille.oswald@supukec.fr",
+  password: "oswald"
+}];
+module.exports = userList;
+//# sourceMappingURL=userList.js.map

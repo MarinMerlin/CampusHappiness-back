@@ -24,6 +24,7 @@ var scheduler = function scheduler() {
           },
           defaults: {
             id: id_generator(),
+            date_emmission: Date.now(),
             sondage_id: sondage_id,
             nombre_emission: 0
           }

@@ -70,7 +70,7 @@ const userConstructor = function (sequelize) {
           photo: '/user/photo/default.jpg',
           mailIntensity: 1,
           group_id: group_id,
-          lastMailDate: Date.now() - 86400000,
+          lastMailDate: Date.now(),
         }).then((user) => {
           accountCreationMail({
             ...user.dataValues,

@@ -216,112 +216,113 @@ User.prototype.getCommentairesJour = function (jour) {
   });
 };
 
-User.prototype.getStatisticsSpecific = function (date) {
-  const searchDate = new Date(parseInt(date.year, 10), parseInt(date.month, 10) - 1, parseInt(date.day, 10));
+User.prototype.getStatisticsSpecific = function (param) {
+  const searchDate = new Date(parseInt(param.year, 10), parseInt(param.month, 10) - 1, parseInt(param.day, 10));
   return new Promise(function (resolveAll) {
-    JourSondage.findOne({ where: { date_emmission: searchDate } }).then((jourSondage) => {
-      if (!jourSondage) {
-        resolveAll("no sondage this day...");
-      } else {
-        const sondage_id = jourSondage.dataValues.sondage_id;
-        console.log(sondage_id);
-        const questionList = [];
-        const thematiqueIdList = [];
-        const remplissageIdList = [];
-        let sondage_name = null;
-        let promises = [];
-        promises.push(new Promise(function (resolve) {
-          Question.findAll({ where: { sondage_id: sondage_id } }).then((questionListFound) => {
-            questionListFound.forEach((question) => {
-              questionList.push(question.dataValues);
-              if (!thematiqueIdList.includes(question.dataValues.thematique_id)) {
-                thematiqueIdList.push(question.dataValues.thematique_id);
-              }
-            });
-            resolve();
-          });
-        }));
-        promises.push(new Promise(function (resolve) {
-          Remplissage.findAll({ where: { sondage_id: sondage_id, date: searchDate } }).then((remplissageListFound) => {
-            remplissageListFound.forEach((remplissage) => {
-              remplissageIdList.push(remplissage.dataValues.id);
-            });
-            resolve();
-          });
-        }));
-        promises.push(new Promise(function (resolve) {
-          Sondage.findOne({ where: { id: sondage_id } }).then((sondage) => {
-            sondage_name = sondage.dataValues.name;
-            resolve();
-          });
-        }));
-        Promise.all(promises).then(() => {
-          promises = [];
-          const thematiqueList = [];
-          const reponseList = [];
+    Group.findOne({ where: { id: param.group } }).then((group) => {
+      const sondage_id = group.dataValues.sondage_id;
+      JourSondage.findOne({ where: { date_emmission: searchDate, sondage_id: sondage_id } }).then((jourSondage) => {
+        if (!jourSondage) {
+          resolveAll("no sondage this day...");
+        } else {
+          const questionList = [];
+          const thematiqueIdList = [];
+          const remplissageIdList = [];
+          let sondage_name = null;
+          let promises = [];
           promises.push(new Promise(function (resolve) {
-            Thematique.findAll({ where: { id: { [Op.or]: thematiqueIdList } } }).then((thematiqueListFound) => {
-              thematiqueListFound.forEach((thematique) => {
-                thematiqueList.push(thematique.dataValues);
+            Question.findAll({ where: { sondage_id: sondage_id } }).then((questionListFound) => {
+              questionListFound.forEach((question) => {
+                questionList.push(question.dataValues);
+                if (!thematiqueIdList.includes(question.dataValues.thematique_id)) {
+                  thematiqueIdList.push(question.dataValues.thematique_id);
+                }
               });
               resolve();
             });
           }));
           promises.push(new Promise(function (resolve) {
-            if (remplissageIdList.length > 0) {
-              Reponse.findAll({ where: { remplissage_id: { [Op.or]: remplissageIdList } } }).then(((reponses) => {
-                reponses.forEach((reponse) => {
-                  reponseList.push(reponse.dataValues);
-                });
-                resolve();
-              }));
-            } else {
+            Remplissage.findAll({ where: { sondage_id: sondage_id, date: searchDate } }).then((remplissageListFound) => {
+              remplissageListFound.forEach((remplissage) => {
+                remplissageIdList.push(remplissage.dataValues.id);
+              });
               resolve();
-            }
+            });
+          }));
+          promises.push(new Promise(function (resolve) {
+            Sondage.findOne({ where: { id: sondage_id } }).then((sondage) => {
+              sondage_name = sondage.dataValues.name;
+              resolve();
+            });
           }));
           Promise.all(promises).then(() => {
-            console.log(questionList);
-            // thematiqueId --> { thematiqueName, questionMap }
-            // questionMap: questionId --> { keyWord, sum, numberAnswer } 
-            const sondageMap = new Map();
-            // thematiqueId -->  name 
-            const thematiqueMap = new Map();
-            thematiqueList.forEach((thematique) => {
-              thematiqueMap.set(thematique.id, thematique.name);
-              sondageMap.set(thematique.id, { thematiqueName: thematique.name, questionMap: new Map() });
-            });
-            // question ID --> thematiqueId
-            const questionToThematique = new Map();
-            questionList.forEach((question) => {
-              questionToThematique.set(question.id, question.thematique_id);
-              sondageMap.get(question.thematique_id).questionMap.set(question.id, { keyWord: question.keyWord, sum: 0, numberAnswer: 0 });
-            });
-            reponseList.forEach((reponse) => {
-              const thematiqueId = questionToThematique.get(reponse.question_id);
-              sondageMap.get(thematiqueId).questionMap.get(reponse.question_id).sum += reponse.valeur;
-              sondageMap.get(thematiqueId).questionMap.get(reponse.question_id).numberAnswer += 1;
-            });
-            const sondageResult = {
-              name: sondage_name,
-              thematiqueList: [],
-            };
-            sondageMap.forEach((thematiqueObject) => {
-              const thematique = {
-                name: thematiqueObject.thematiqueName,
-                questionList: [],
-              };
-              thematiqueObject.questionMap.forEach((questionObject) => {
-                thematique.questionList.push({
-                  keyWord: questionObject.keyWord,
-                  avg: questionObject.sum / (questionObject.numberAnswer || 1),
+            promises = [];
+            const thematiqueList = [];
+            const reponseList = [];
+            promises.push(new Promise(function (resolve) {
+              Thematique.findAll({ where: { id: { [Op.or]: thematiqueIdList } } }).then((thematiqueListFound) => {
+                thematiqueListFound.forEach((thematique) => {
+                  thematiqueList.push(thematique.dataValues);
                 });
+                resolve();
               });
-              sondageResult.thematiqueList.push(thematique);
+            }));
+            promises.push(new Promise(function (resolve) {
+              if (remplissageIdList.length > 0) {
+                Reponse.findAll({ where: { remplissage_id: { [Op.or]: remplissageIdList } } }).then(((reponses) => {
+                  reponses.forEach((reponse) => {
+                    reponseList.push(reponse.dataValues);
+                  });
+                  resolve();
+                }));
+              } else {
+                resolve();
+              }
+            }));
+            Promise.all(promises).then(() => {
+              console.log(questionList);
+              // thematiqueId --> { thematiqueName, questionMap }
+              // questionMap: questionId --> { keyWord, sum, numberAnswer } 
+              const sondageMap = new Map();
+              // thematiqueId -->  name 
+              const thematiqueMap = new Map();
+              thematiqueList.forEach((thematique) => {
+                thematiqueMap.set(thematique.id, thematique.name);
+                sondageMap.set(thematique.id, { thematiqueName: thematique.name, questionMap: new Map() });
+              });
+              // question ID --> thematiqueId
+              const questionToThematique = new Map();
+              questionList.forEach((question) => {
+                questionToThematique.set(question.id, question.thematique_id);
+                sondageMap.get(question.thematique_id).questionMap.set(question.id, { keyWord: question.keyWord, sum: 0, numberAnswer: 0 });
+              });
+              reponseList.forEach((reponse) => {
+                const thematiqueId = questionToThematique.get(reponse.question_id);
+                sondageMap.get(thematiqueId).questionMap.get(reponse.question_id).sum += reponse.valeur;
+                sondageMap.get(thematiqueId).questionMap.get(reponse.question_id).numberAnswer += 1;
+              });
+              const sondageResult = {
+                name: sondage_name,
+                thematiqueList: [],
+              };
+              sondageMap.forEach((thematiqueObject) => {
+                const thematique = {
+                  name: thematiqueObject.thematiqueName,
+                  questionList: [],
+                };
+                thematiqueObject.questionMap.forEach((questionObject) => {
+                  thematique.questionList.push({
+                    keyWord: questionObject.keyWord,
+                    avg: questionObject.sum / (questionObject.numberAnswer || 1),
+                  });
+                });
+                sondageResult.thematiqueList.push(thematique);
+              });
+              resolveAll(sondageResult);
             });
-            resolveAll(sondageResult);
           });
-        });
-      }
+        }
+      });
     });
   });
 };
@@ -369,10 +370,10 @@ User.prototype.getStatistics = function (next) {
 
   const getJourSentSondage = jour => new Promise((resolve) => {
     const jourDate = new Date(jour).toLocaleDateString();
-    JourSondage.findOne({ where: { date_emmission: jour } }).then((jsondage) => {
-      if (jsondage) {
-        console.log("On ", jourDate, ", ", jsondage.dataValues.nombre_emission, " mails were sent.");
-        resolve(jsondage.dataValues.nombre_emission);
+    JourSondage.sum('nombre_emission', { where: { date_emmission: jour } }).then((jsondage) => {
+      if (jsondage > 0) {
+        console.log("On ", jourDate, ", ", jsondage, " mails were sent.");
+        resolve(jsondage);
       } else {
         console.log("No mail sent on: ", jourDate);
         resolve(0);
