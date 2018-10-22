@@ -15,17 +15,17 @@ const Models = require('../models/index');
 
 router.use(morgan('dev'));
 
-// router.use((req, res, next) => {
-//   if (req.url === '/login') {
-//     next();
-//   } else if (!req.isAuthenticated()) {
-//     res.status(401).json({ message: 'Not logged in' });
-//   } else if (req.user.auth !== 1) {
-//     res.status(401).json({ message: 'Not authorized' });
-//   } else {
-//     next();
-//   }
-// });
+router.use((req, res, next) => {
+  if (req.url === '/login') {
+    next();
+  } else if (!req.isAuthenticated()) {
+    res.status(401).json({ message: 'Not logged in' });
+  } else if (req.user.auth !== 1) {
+    res.status(401).json({ message: 'Not authorized' });
+  } else {
+    next();
+  }
+});
 
 // --------- Routes protegées par token -------------
 
@@ -170,7 +170,7 @@ router.get("/generalStatistics", (req, res) => {
   });
 });
 
-router.get("/specificStatistics/:year/:month/:day", (req, res) => {
+router.get("/specificStatistics/:year/:month/:day/:group", (req, res) => {
   Models.User.findById(req.user.id).then((user) => {
     user.getStatisticsSpecific(req.params).then((sondageResult) => {
       res.json(sondageResult);

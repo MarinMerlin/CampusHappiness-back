@@ -19,11 +19,15 @@ var postConstructor = function postConstructor(sequelize) {
     },
     text: {
       allowNull: false,
-      type: Sequelize.STRING
+      type: Sequelize.TEXT
     },
     imageURL: {
       allowNull: false,
       type: Sequelize.STRING
+    },
+    linkURL: {
+      allowNull: true,
+      type: Sequelize.TEXT
     }
   }, {
     timestamps: false
@@ -40,7 +44,8 @@ var postConstructor = function postConstructor(sequelize) {
           id: id_generator(),
           title: post.title,
           text: post.text,
-          imageURL: post.imageURL
+          imageURL: post.imageURL,
+          linkURL: post.linkURL
         }).then(function () {
           resolve();
         });

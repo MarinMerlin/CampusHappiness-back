@@ -16,32 +16,33 @@ var morgan = require('morgan'); // Récupère les models
 
 var Models = require('../models/index');
 
-router.use(morgan('dev')); // router.use((req, res, next) => {
-//   if (req.url === '/login') {
-//     next();
-//   } else if (!req.isAuthenticated()) {
-//     res.status(401).json({ message: 'Not logged in' });
-//   } else if (req.user.auth !== 1) {
-//     res.status(401).json({ message: 'Not authorized' });
-//   } else {
-//     next();
-//   }
-// });
-// --------- Routes protegées par token -------------
+router.use(morgan('dev'));
+router.use(function (req, res, next) {
+  if (req.url === '/login') {
+    next();
+  } else if (!req.isAuthenticated()) {
+    res.status(401).json({
+      message: 'Not logged in'
+    });
+  } else if (req.user.auth !== 1) {
+    res.status(401).json({
+      message: 'Not authorized'
+    });
+  } else {
+    next();
+  }
+}); // --------- Routes protegées par token -------------
 // Un administrateur peut ajouter un autre administrateur :
 // Les attributs de l'admin sont dans le body de la requète
 // TODO : Prendre en compte le cas où il y a une erreure au cours de la création de l'admin'
 // Routes relatives a la gestion des admins et des users
 
 /* router.post('/createAdmin', (req, res) => {
-  console.log(`creating admin ${req.body.pseudo}`);
   // On vérifie que les données minmums pour créer un utilisateur sont bien présentes
   if (!req.body.pseudo || !req.body.mp) {
-    console.log("/!\\ ERROR : The body of the create admin request doesnt contain pseudo or mp !");
     res.status(400).send("Bad Request : The body of the create admin request doesnt contain pseudo or mp ! ");
   } else {
     Models.Admin.addAdmin(req.body.pseudo, req.body.mp, Date.now()).then(() => {
-      console.log(`Added admin: ${req.body.pseudo}`);
       res.status(200).send(`Admin ${req.body.pseudo} created`);
     });
   }
@@ -129,7 +130,6 @@ router.get('/getSondage', function (req, res) {
     }
   }).then(function (user) {
     user.getSondage().then(function (sondageList) {
-      console.log("Sent all sondages to client");
       res.status(200).json(sondageList);
     });
   });
@@ -161,7 +161,6 @@ router.post('/postSondage', function (req, res) {
 });
 router.post('/changeNextSondage', function (req, res) {
   if (!req.body) {
-    console.log("/!\\ ERROR : Inccorect body");
     res.status(400).send("Bad Request : The body doesnt contain next_sondage ! ");
   } else {
     Models.Group.update({
@@ -180,7 +179,6 @@ router.post('/changeNextSondage', function (req, res) {
 router.get('/getCommentaireJour/:jour', function (req, res) {
   Models.User.findById(req.user.id).then(function (user) {
     user.getCommentairesJour(req.params.jour).then(function (comments) {
-      console.log("Fetching all Commentaires on: ", req.params.jour);
       res.status(200).json(comments);
     });
   });
@@ -192,8 +190,9 @@ router.get("/generalStatistics", function (req, res) {
     });
   });
 });
-router.get("/specificStatistics/:year/:month/:day", function (req, res) {
+router.get("/specificStatistics/:year/:month/:day/:group", function (req, res) {
   Models.User.findById(req.user.id).then(function (user) {
+    console.log(req.params);
     user.getStatisticsSpecific(req.params).then(function (sondageResult) {
       res.json(sondageResult);
     });

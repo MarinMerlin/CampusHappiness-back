@@ -20,28 +20,8 @@ var Sondage = Models.Sondage,
 var simulationTime = 35;
 var simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
-
-var rand = function rand(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-};
-
-var randRep = function randRep(date) {
-  var diff = simulationTime - Math.round((Date.now() - date) / (1000 * 60 * 60 * 24));
-  var i = rand(44) + rand(diff);
-
-  if (i >= 0 && i <= 14) {
-    return -1;
-  }
-
-  if (i >= 15 && i <= 29) {
-    return 0;
-  }
-
-  if (i >= 29) {
-    return 1;
-  }
-};
-
+var groupIds = [id_generator(), id_generator()];
+var sondageIds = [id_generator(), id_generator()];
 var fakeSurvey = {
   name: 'Condition de travail',
   thematiqueList: [{
@@ -100,6 +80,149 @@ var fakeSurvey = {
     }]
   }]
 };
+var fakeSurvey2 = {
+  name: 'Cours',
+  thematiqueList: [{
+    name: 'Amphithéatre',
+    questionList: [{
+      text: 'Les sièges sont confortable?',
+      keyWord: 'Confort'
+    }, {
+      text: "Le cours était trop long?",
+      keyWord: 'Attente'
+    }, {
+      text: 'Etait-ce trop bryuant?',
+      keyWord: 'Bruit'
+    }, {
+      text: 'Le cours était intéressant?',
+      keyWord: 'Qualité'
+    }, {
+      text: "Propreté de la l'amphithéatre",
+      keyWord: 'Propreté'
+    }, {
+      text: "Propreté des sanitaires",
+      keyWord: 'propreté'
+    }]
+  }, {
+    name: 'Salle de TD',
+    questionList: [{
+      text: 'Le lieux était il propre',
+      keyWord: 'Propreté'
+    }, {
+      text: "L'ambiance était elle convenable?",
+      keyWord: 'Ambiance'
+    }, {
+      text: 'Temperature convenable?',
+      keyWord: 'Temperature'
+    }]
+  }]
+};
+var userList = [{
+  firstName: "Jean",
+  lastName: "Michel",
+  pseudo: "Jean",
+  email: "jean.michel@supukec.fr",
+  password: "michel"
+}, {
+  firstName: "Charles",
+  lastName: "Henry",
+  pseudo: "Charles",
+  email: "charles.henry@supukec.fr",
+  password: "henry"
+}, {
+  firstName: "John",
+  lastName: "Michelangelo",
+  pseudo: "John",
+  email: "john.michelangelo@supukec.fr",
+  password: "michelangelo"
+}, {
+  firstName: "Martin",
+  lastName: "Mystère",
+  pseudo: "Martin",
+  email: "martin.mystere@supukec.fr",
+  password: "mystere"
+}, {
+  firstName: "Bob",
+  lastName: "Laiponje",
+  pseudo: "Bob",
+  email: "bob.laiponje@supukec.fr",
+  password: "laiponje"
+}, {
+  firstName: "Jacques",
+  lastName: "Adi",
+  pseudo: "Jacques",
+  email: "jacques.adi@supukec.fr",
+  password: "adi"
+}, {
+  firstName: "Jean",
+  lastName: "Michel",
+  pseudo: "Jean",
+  email: "jean.michel@supukec.fr",
+  password: "michel"
+}, {
+  firstName: "Goerge",
+  lastName: "Michaels",
+  pseudo: "Goerge",
+  email: "goerge.michaels@supukec.fr",
+  password: "michaels"
+}, {
+  firstName: "Merin",
+  lastName: "Marlin",
+  pseudo: "merin",
+  email: "merin.marlin@supukec.fr",
+  password: "marlin"
+}, {
+  firstName: "Marie",
+  lastName: "Jeanne",
+  pseudo: "Marie",
+  email: "marie.jeanne@supukec.fr",
+  password: "jeanne"
+}, {
+  firstName: "Claire",
+  lastName: "Dejager",
+  pseudo: "Claire",
+  email: "claire.dejager@supukec.fr",
+  password: "dejager"
+}, {
+  firstName: "Anne",
+  lastName: "Collins",
+  pseudo: "Anne",
+  email: "anne.collins@supukec.fr",
+  password: "anne"
+}, {
+  firstName: "Laure",
+  lastName: "Bailleul",
+  pseudo: "laure",
+  email: "laure.bailleul@supukec.fr",
+  password: "bailleul"
+}, {
+  firstName: "Camille",
+  lastName: "Oswald",
+  pseudo: "Camille",
+  email: "camille.oswald@supukec.fr",
+  password: "oswald"
+}];
+
+var rand = function rand(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+};
+
+var randRep = function randRep(date) {
+  var diff = simulationTime - Math.round((Date.now() - date) / (1000 * 60 * 60 * 24));
+  var i = rand(44) + rand(diff);
+
+  if (i >= 0 && i <= 14) {
+    return -1;
+  }
+
+  if (i >= 15 && i <= 29) {
+    return 0;
+  }
+
+  if (i >= 29) {
+    return 1;
+  }
+};
 
 var incrementDay = function incrementDay() {
   simulationDay.setDate(simulationDay.getDate() + 1);
@@ -111,7 +234,8 @@ var addManyUsers = function addManyUsers(userNumber) {
       var promiseArray = [];
 
       for (var i = 0; i < userNumber; i++) {
-        promiseArray.push(User.addUser('User', 'User', 'user.user@gmail.fr', 'User', 'mdp', 0));
+        var user = userList[rand(userList.length)];
+        promiseArray.push(User.addUser(user.firstName, user.lastName, user.email, user.pseudo, user.password, 0, groupIds[rand(2)]));
       }
 
       Promise.all(promiseArray).then(resolve);
@@ -122,34 +246,45 @@ var addManyUsers = function addManyUsers(userNumber) {
 };
 
 var fakeSurvey_id = null;
-var questionIdList = [];
+var questionIdList = {};
 
-var getQuestionIdList = function getQuestionIdList(fakeSurveyId) {
-  fakeSurvey_id = fakeSurveyId;
+var getQuestionIdList = function getQuestionIdList(fakeSurveyId1, fakeSurveyId2) {
   return new Promise(function (resolve) {
     Question.findAll({
       where: {
-        sondage_id: fakeSurveyId
+        sondage_id: fakeSurveyId1
       }
     }).then(function (questions) {
+      questionIdList[fakeSurveyId1] = [];
       questions.forEach(function (question) {
-        questionIdList.push(question.id);
+        questionIdList[fakeSurveyId1].push(question.id);
       });
-      console.log("nombre de question dans la base de donnée:", questionIdList.length, "  ", questions.length);
-      resolve();
+      console.log("nombre de question dans la base de donnée:", questionIdList[fakeSurveyId1].length, "  ", questions.length);
+      Question.findAll({
+        where: {
+          sondage_id: fakeSurveyId2
+        }
+      }).then(function (questions2) {
+        questionIdList[fakeSurveyId2] = [];
+        questions2.forEach(function (question2) {
+          questionIdList[fakeSurveyId2].push(question2.id);
+        });
+        console.log("nombre de question dans la base de donnée:", questionIdList[fakeSurveyId2].length, "  ", questions2.length);
+        resolve();
+      });
     });
   });
 };
 
-var answerSondage_simulation = function answerSondage_simulation(user, date) {
+var answerSondage_simulation = function answerSondage_simulation(user, date, sondage_id) {
   return new Promise(function (resolve) {
     var fake_answer = {
       remplissage_id: id_generator(),
-      sondage_id: fakeSurvey_id,
+      sondage_id: sondage_id,
       answered_questions: [],
       answered_commentaires: []
     };
-    questionIdList.forEach(function (question_id) {
+    questionIdList[sondage_id].forEach(function (question_id) {
       fake_answer.answered_questions.push({
         question_id: question_id,
         answer: randRep(date)
@@ -163,28 +298,38 @@ var answerSondage_simulation = function answerSondage_simulation(user, date) {
 
 var answerUserListSondage_simulation = function answerUserListSondage_simulation(users, date) {
   return new Promise(function (resolve) {
+    console.log(simulationDay, " / ", date);
     var promiseArray = [];
-    JourSondage.addJourSondage(fakeSurvey_id, simulationDay, users.length);
-    users.forEach(function (user) {
-      if (rand(3) !== 0) {
-        promiseArray.push(answerSondage_simulation(user, date));
-      }
-    });
-    Promise.all(promiseArray).then(function () {
-      resolve();
-    });
-  });
-};
-
-var answerAll = function answerAll() {
-  return new Promise(function (resolve) {
-    Sondage.findOne({
-      where: {
-        name: fakeSurvey.name
-      }
+    JourSondage.create({
+      id: id_generator(),
+      date_emmission: simulationDay,
+      sondage_id: sondageIds[0],
+      nombre_emission: 0
     }).then(function () {
-      User.findAll().then(function (users) {
-        answerUserListSondage_simulation(users, simulationDay).then(function () {
+      JourSondage.create({
+        id: id_generator(),
+        date_emmission: simulationDay,
+        sondage_id: sondageIds[1],
+        nombre_emission: 0
+      }).then(function () {
+        users.forEach(function (user) {
+          var sondage_id = user.dataValues.group.dataValues.sondage_id;
+          JourSondage.find({
+            where: {
+              sondage_id: sondage_id,
+              date_emmission: simulationDay
+            }
+          }).then(function (jourSondage) {
+            if (rand(3) !== 0) {
+              promiseArray.push(answerSondage_simulation(user, date, sondage_id));
+            }
+
+            jourSondage.increment({
+              nombre_emission: 1
+            });
+          });
+        });
+        Promise.all(promiseArray).then(function () {
           resolve();
         });
       });
@@ -192,24 +337,53 @@ var answerAll = function answerAll() {
   });
 };
 
+var answerAll = function answerAll() {
+  return new Promise(function (resolve) {
+    User.findAll({
+      include: [{
+        model: Group
+      }]
+    }).then(function (users) {
+      answerUserListSondage_simulation(users, simulationDay).then(function () {
+        resolve();
+      });
+    });
+  });
+};
+
 var firstDay = function firstDay() {
   return new Promise(function (resolve) {
-    var sondage_id = id_generator();
+    var sondage_id = sondageIds[0];
+    var sondage_id2 = sondageIds[1];
     Sondage.addSondage(sondage_id, 'Admin', Date.now(), fakeSurvey.name).then(function () {
-      Group.addGroup(sondage_id, 'default', env.default_group).then(function () {
-        User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1).then(function () {
-          addManyUsers(10).then(function () {
-            User.findOne({
-              where: {
-                pseudo: 'Admin'
-              }
-            }).then(function (user) {
-              user.updateSondage(fakeSurvey, sondage_id).then(function () {
-                Keyword.addKeyword("Qualité");
-                getQuestionIdList(sondage_id).then(function () {
-                  answerAll().then(function () {
-                    incrementDay();
-                    resolve();
+      Sondage.addSondage(sondage_id2, 'Admin', Date.now(), fakeSurvey2.name).then(function () {
+        Group.addGroup(sondage_id, 'Professeurs', groupIds[0]).then(function () {
+          Group.addGroup(sondage_id2, 'Eleves', groupIds[1]).then(function () {
+            User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1, groupIds[0]).then(function () {
+              addManyUsers(10).then(function () {
+                User.findOne({
+                  where: {
+                    pseudo: 'Admin'
+                  }
+                }).then(function (user) {
+                  user.updateSondage(fakeSurvey, sondage_id).then(function () {
+                    user.updateSondage(fakeSurvey2, sondage_id2).then(function () {
+                      Keyword.addKeyword("Qualité");
+                      Keyword.addKeyword("Attente");
+                      Keyword.addKeyword("Bruit");
+                      Keyword.addKeyword("Prix");
+                      Keyword.addKeyword("Propreté");
+                      Keyword.addKeyword("Materielle");
+                      Keyword.addKeyword("Ambiance");
+                      Keyword.addKeyword("Température");
+                      Keyword.addKeyword("Confort");
+                      getQuestionIdList(sondage_id, sondage_id2).then(function () {
+                        answerAll().then(function () {
+                          incrementDay();
+                          resolve();
+                        });
+                      });
+                    });
                   });
                 });
               });
@@ -271,7 +445,8 @@ clearTables().then(function () {
 var post_number = 6;
 var fake_post = {
   title: "Good News !",
-  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  text: "Et quia Montius inter dilancinantium manus spiritum efflaturus Epigonum et Eusebium nec professionem nec dignitatem ostendens aliquotiens increpabat, qui sint hi magna quaerebatur industria, et nequid intepesceret, Epigonus e Lycia philosophus ducitur et Eusebius ab Emissa Pittacas cognomento, concitatus orator, cum quaestor non hos sed tribunos fabricarum insimulasset promittentes armorum si novas res agitari conperissent.",
+  linkURL: 'https://fr.wikipedia.org/wiki/Vincent_Martin'
 };
 console.log("Adding posts ...");
 var postPromiseArray = [];

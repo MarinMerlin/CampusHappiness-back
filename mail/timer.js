@@ -16,7 +16,7 @@ const scheduler = function () {
         const sondage_id = data.dataValues.group.dataValues.sondage_id;
         Models.JourSondage.findOrCreate({ 
           where: { date_emmission: Date.now(), sondage_id: sondage_id },
-          defaults: { id: id_generator(), sondage_id: sondage_id, nombre_emission: 0 }, 
+          defaults: { id: id_generator(), date_emmission: Date.now(), sondage_id: sondage_id, nombre_emission: 0 }, 
         }).spread((jourSondage, created) => {
           const token = data.generateJwt(sondage_id);
           const diff = Date.now() - data.dataValues.lastMailDate;
