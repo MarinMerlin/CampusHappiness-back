@@ -35,14 +35,11 @@ router.use(morgan('dev'));
 
 // Routes relatives a la gestion des admins et des users
 /* router.post('/createAdmin', (req, res) => {
-  console.log(`creating admin ${req.body.pseudo}`);
   // On vérifie que les données minmums pour créer un utilisateur sont bien présentes
   if (!req.body.pseudo || !req.body.mp) {
-    console.log("/!\\ ERROR : The body of the create admin request doesnt contain pseudo or mp !");
     res.status(400).send("Bad Request : The body of the create admin request doesnt contain pseudo or mp ! ");
   } else {
     Models.Admin.addAdmin(req.body.pseudo, req.body.mp, Date.now()).then(() => {
-      console.log(`Added admin: ${req.body.pseudo}`);
       res.status(200).send(`Admin ${req.body.pseudo} created`);
     });
   }
@@ -121,7 +118,6 @@ router.post('/changeUserGroup', (req, res) => {
 router.get('/getSondage', (req, res) => {
   Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
     user.getSondage().then((sondageList) => {
-      console.log("Sent all sondages to client");
       res.status(200).json(sondageList);
     });
   });
@@ -146,7 +142,6 @@ router.post('/postSondage', (req, res) => {
 
 router.post('/changeNextSondage', (req, res) => {
   if (!req.body) {
-    console.log("/!\\ ERROR : Inccorect body");
     res.status(400).send("Bad Request : The body doesnt contain next_sondage ! ");
   } else {
     Models.Group.update({ sondage_id: req.body.sondage_id }, { where: { id: req.body.group_id } })
@@ -162,7 +157,6 @@ router.post('/changeNextSondage', (req, res) => {
 router.get('/getCommentaireJour/:jour', (req, res) => {
   Models.User.findById(req.user.id).then((user) => {
     user.getCommentairesJour(req.params.jour).then((comments) => {
-      console.log("Fetching all Commentaires on: ", req.params.jour);
       res.status(200).json(comments);
     });
   });
