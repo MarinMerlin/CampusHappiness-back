@@ -1,7 +1,6 @@
 const Models = require("./index");
 const id_generator = require('../custom_module/id_generator');
 const clearTables = require('./setup');
-const env = require("../const");
 
 const { 
   Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group, Post,
@@ -11,241 +10,13 @@ const simulationTime = 35;
 const simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
 
+const userList = require('./simulationData/userList');
+const { fakeSurvey, fakeSurvey2 } = require('./simulationData/fakeSurveys');
+const postList = require('./simulationData/postList');
+
 const groupIds = [id_generator(), id_generator()];
 const sondageIds = [id_generator(), id_generator()];
-const fakeSurvey = {
-  name: 'Working conditions',
-  thematiqueList: [
-    {
-      name: 'Cafetaria',
-      questionList: [
-        {
-          text: 'Was the meal satisfactory?',
-          keyWord: 'Quality',
-        },
-        {
-          text: "How was the wait?",
-          keyWord: 'Wait',
-        },
-        {
-          text: 'Was it to noisy?',
-          keyWord: 'Noise',
-        },
-        {
-          text: 'Was the price correct?',
-          keyWord: 'Price',
-        },
-        {
-          text: "Cleanliness of the cafetaria",
-          keyWord: 'Propreté',
-        },
-        {
-          text: "Cleanliness",
-          keyWord: 'propreté',
-        },
-      ],
-    },
-    {
-      name: 'Bureau',
-      questionList: [
-        {
-          text: "Avez vous été productif aujourd'hui?",
-          keyWord: 'Productivité',
-        },
-        {
-          text: 'Comment était la température?',
-          keyWord: 'Température',
-        },
-        {
-          text: 'Etait-ce trop bryuant?',
-          keyWord: 'Bruit',
-        },
-        {
-          text: 'Votre bureau était il sale?',
-          keyWord: 'Propreté',
-        },
-        {
-          text: 'Ambiance',
-          keyWord: 'Ambiance',
-        },
-        {
-          text: 'Le materielle',
-          keyWord: 'Materielle',
-        },
-      ],
-    },
-    {
-      name: 'Espace de repos',
-      questionList: [
-        {
-          text: 'Le lieux était il propre',
-          keyWord: 'Propreté',
-        },
-        {
-          text: "L'ambiance était elle convenable?",
-          keyWord: 'Ambiance',
-        },
-        {
-          text: 'Temperature convenable?',
-          keyWord: 'Temperature',
-        },
-      ],
-    },
-  ],
-};
 
-const fakeSurvey2 = {
-  name: 'Cours',
-  thematiqueList: [
-    {
-      name: 'Amphithéatre',
-      questionList: [
-        {
-          text: 'Les sièges sont confortable?',
-          keyWord: 'Confort',
-        },
-        {
-          text: "Le cours était trop long?",
-          keyWord: 'Attente',
-        },
-        {
-          text: 'Etait-ce trop bryuant?',
-          keyWord: 'Bruit',
-        },
-        {
-          text: 'Le cours était intéressant?',
-          keyWord: 'Qualité',
-        },
-        {
-          text: "Propreté de la l'amphithéatre",
-          keyWord: 'Propreté',
-        },
-        {
-          text: "Propreté des sanitaires",
-          keyWord: 'propreté',
-        },
-      ],
-    },
-    {
-      name: 'Salle de TD',
-      questionList: [
-        {
-          text: 'Le lieux était il propre',
-          keyWord: 'Propreté',
-        },
-        {
-          text: "L'ambiance était elle convenable?",
-          keyWord: 'Ambiance',
-        },
-        {
-          text: 'Temperature convenable?',
-          keyWord: 'Temperature',
-        },
-      ],
-    },
-  ],
-};
-
-const userList = [
-  {
-    firstName: "Jean",
-    lastName: "Michel",
-    pseudo: "Jean",
-    email: "jean.michel@supukec.fr",
-    password: "michel",
-  },
-  {
-    firstName: "Charles",
-    lastName: "Henry",
-    pseudo: "Charles",
-    email: "charles.henry@supukec.fr",
-    password: "henry",
-  },
-  {
-    firstName: "John",
-    lastName: "Michelangelo",
-    pseudo: "John",
-    email: "john.michelangelo@supukec.fr",
-    password: "michelangelo",
-  },
-  {
-    firstName: "Martin",
-    lastName: "Mystère",
-    pseudo: "Martin",
-    email: "martin.mystere@supukec.fr",
-    password: "mystere",
-  },
-  {
-    firstName: "Bob",
-    lastName: "Laiponje",
-    pseudo: "Bob",
-    email: "bob.laiponje@supukec.fr",
-    password: "laiponje",
-  },
-  {
-    firstName: "Jacques",
-    lastName: "Adi",
-    pseudo: "Jacques",
-    email: "jacques.adi@supukec.fr",
-    password: "adi",
-  },
-  {
-    firstName: "Jean",
-    lastName: "Michel",
-    pseudo: "Jean",
-    email: "jean.michel@supukec.fr",
-    password: "michel",
-  },
-  {
-    firstName: "Goerge",
-    lastName: "Michaels",
-    pseudo: "Goerge",
-    email: "goerge.michaels@supukec.fr",
-    password: "michaels",
-  },
-  {
-    firstName: "Merin",
-    lastName: "Marlin",
-    pseudo: "merin",
-    email: "merin.marlin@supukec.fr",
-    password: "marlin",
-  },
-  {
-    firstName: "Marie",
-    lastName: "Jeanne",
-    pseudo: "Marie",
-    email: "marie.jeanne@supukec.fr",
-    password: "jeanne",
-  },
-  {
-    firstName: "Claire",
-    lastName: "Dejager",
-    pseudo: "Claire",
-    email: "claire.dejager@supukec.fr",
-    password: "dejager",
-  },
-  {
-    firstName: "Anne",
-    lastName: "Collins",
-    pseudo: "Anne",
-    email: "anne.collins@supukec.fr",
-    password: "anne",
-  },
-  {
-    firstName: "Laure",
-    lastName: "Bailleul",
-    pseudo: "laure",
-    email: "laure.bailleul@supukec.fr",
-    password: "bailleul",
-  },
-  {
-    firstName: "Camille",
-    lastName: "Oswald",
-    pseudo: "Camille",
-    email: "camille.oswald@supukec.fr",
-    password: "oswald",
-  },
-];
 
 const rand = function (max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -282,7 +53,6 @@ const addManyUsers = function (userNumber) {
   });
 };
 
-const fakeSurvey_id = null;
 const questionIdList = {};
 
 const getQuestionIdList = function (fakeSurveyId1, fakeSurveyId2) {
@@ -458,17 +228,13 @@ clearTables().then(() => {
 });
 
 const post_number = 6;
-const fake_post = {
-  title: "Good News !",
-  text: "Et quia Montius inter dilancinantium manus spiritum efflaturus Epigonum et Eusebium nec professionem nec dignitatem ostendens aliquotiens increpabat, qui sint hi magna quaerebatur industria, et nequid intepesceret, Epigonus e Lycia philosophus ducitur et Eusebius ab Emissa Pittacas cognomento, concitatus orator, cum quaestor non hos sed tribunos fabricarum insimulasset promittentes armorum si novas res agitari conperissent.",
-  linkURL: 'https://fr.wikipedia.org/wiki/Vincent_Martin',
-};
 
 console.log("Adding posts ...");
 const postPromiseArray = [];
-for (let index = 0; index < 6; index++) {
+postList.forEach((fake_post) => {
   postPromiseArray.push(Post.addPost(fake_post));
-}
+});
+
 Promise.all(postPromiseArray).then(() => {
   console.log(post_number, " Posts added");
 });
