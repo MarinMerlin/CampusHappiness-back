@@ -1,77 +1,77 @@
 const fakeSurvey = {
-  name: 'Condition de travail',
+  name: 'Working conditions',
   thematiqueList: [
     {
-      name: 'Cafétaria',
+      name: 'Cafetaria',
       questionList: [
         {
-          text: 'Le repas était-il convenable?',
-          keyWord: 'Qualité',
+          text: 'Was the meal satisfactory?',
+          keyWord: 'Quality',
         },
         {
-          text: "Comment était l'attente?",
-          keyWord: 'Attente',
+          text: "How was the wait?",
+          keyWord: 'Wait',
         },
         {
-          text: 'Etait-ce trop bryuant?',
-          keyWord: 'Bruit',
+          text: 'Was it too noisy?',
+          keyWord: 'Noise',
         },
         {
-          text: 'Le prix convenait il?',
-          keyWord: 'Prix',
+          text: 'Was the price correct?',
+          keyWord: 'Price',
         },
         {
-          text: "Propreté de la cafeteria",
-          keyWord: 'Propreté',
+          text: "Cleanliness of the cafetaria",
+          keyWord: 'Cleanliness',
         },
         {
-          text: "Propreté des sanitaires",
-          keyWord: 'propreté',
+          text: "Cleanliness of the restrooms",
+          keyWord: 'Cleanliness',
         },
       ],
     },
     {
-      name: 'Bureau',
+      name: 'Office',
       questionList: [
         {
-          text: "Avez vous été productif aujourd'hui?",
-          keyWord: 'Productivité',
+          text: "Were productive today?",
+          keyWord: 'Productivty',
         },
         {
-          text: 'Comment était la température?',
-          keyWord: 'Température',
+          text: 'How was the temperature?',
+          keyWord: 'Temperature',
         },
         {
-          text: 'Etait-ce trop bryuant?',
-          keyWord: 'Bruit',
+          text: 'Was it too noisy?',
+          keyWord: 'Noise',
         },
         {
-          text: 'Votre bureau était il sale?',
-          keyWord: 'Propreté',
+          text: 'Was your office dirty?',
+          keyWord: 'Cleanliness',
         },
         {
-          text: 'Ambiance',
-          keyWord: 'Ambiance',
+          text: 'How was the mood?',
+          keyWord: 'Mood',
         },
         {
-          text: 'Le materielle',
-          keyWord: 'Materielle',
+          text: 'Was your computer performing good?',
+          keyWord: 'Hardware',
         },
       ],
     },
     {
-      name: 'Espace de repos',
+      name: 'Rest Space',
       questionList: [
         {
-          text: 'Le lieux était il propre',
-          keyWord: 'Propreté',
+          text: 'Was the room clean?',
+          keyWord: 'Cleanliness',
         },
         {
-          text: "L'ambiance était elle convenable?",
-          keyWord: 'Ambiance',
+          text: "How was the mood?",
+          keyWord: 'Mood',
         },
         {
-          text: 'Temperature convenable?',
+          text: 'Was the temperature ok?',
           keyWord: 'Temperature',
         },
       ],
@@ -80,50 +80,50 @@ const fakeSurvey = {
 };
 
 const fakeSurvey2 = {
-  name: 'Cours',
+  name: 'Classes',
   thematiqueList: [
     {
-      name: 'Amphithéatre',
+      name: 'Auditorium',
       questionList: [
         {
-          text: 'Les sièges sont confortable?',
-          keyWord: 'Confort',
+          text: 'Were the seats comfortable?',
+          keyWord: 'Comfort',
         },
         {
-          text: "Le cours était trop long?",
-          keyWord: 'Attente',
+          text: "Was the class too long?",
+          keyWord: 'Wait',
         },
         {
-          text: 'Etait-ce trop bryuant?',
-          keyWord: 'Bruit',
+          text: 'Was it too noisy?',
+          keyWord: 'Noise',
         },
         {
-          text: 'Le cours était intéressant?',
-          keyWord: 'Qualité',
+          text: 'Was the class interesting?',
+          keyWord: 'Quality',
         },
         {
-          text: "Propreté de la l'amphithéatre",
-          keyWord: 'Propreté',
+          text: "Was the auditorium clean?",
+          keyWord: 'Cleanliness',
         },
         {
-          text: "Propreté des sanitaires",
-          keyWord: 'propreté',
+          text: "Cleanliness of the restrooms?",
+          keyWord: 'Cleanliness',
         },
       ],
     },
     {
-      name: 'Salle de TD',
+      name: 'Lab room',
       questionList: [
         {
-          text: 'Le lieux était il propre',
-          keyWord: 'Propreté',
+          text: "Cleanliness of the lab?",
+          keyWord: 'Cleanliness',
         },
         {
-          text: "L'ambiance était elle convenable?",
-          keyWord: 'Ambiance',
+          text: "How was the mood?",
+          keyWord: 'Mood',
         },
         {
-          text: 'Temperature convenable?',
+          text: 'Was the temperature ok?',
           keyWord: 'Temperature',
         },
       ],

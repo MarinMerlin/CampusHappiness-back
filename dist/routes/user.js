@@ -110,5 +110,10 @@ router.get('/userStat', function (req, res) {
     });
   });
 });
+router.get("/getPosts", function (req, res) {
+  Models.Post.findAll().then(function (posts) {
+    res.json(posts);
+  });
+});
 module.exports = router;
 //# sourceMappingURL=user.js.map

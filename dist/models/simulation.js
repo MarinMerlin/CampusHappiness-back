@@ -6,8 +6,6 @@ var id_generator = require('../custom_module/id_generator');
 
 var clearTables = require('./setup');
 
-var env = require("../const");
-
 var Sondage = Models.Sondage,
     User = Models.User,
     Reponse = Models.Reponse,
@@ -20,188 +18,17 @@ var Sondage = Models.Sondage,
 var simulationTime = 35;
 var simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
+
+var userList = require('./simulationData/userList');
+
+var _require = require('./simulationData/fakeSurveys'),
+    fakeSurvey = _require.fakeSurvey,
+    fakeSurvey2 = _require.fakeSurvey2;
+
+var postList = require('./simulationData/postList');
+
 var groupIds = [id_generator(), id_generator()];
 var sondageIds = [id_generator(), id_generator()];
-var fakeSurvey = {
-  name: 'Condition de travail',
-  thematiqueList: [{
-    name: 'Cafétaria',
-    questionList: [{
-      text: 'Le repas était-il convenable?',
-      keyWord: 'Qualité'
-    }, {
-      text: "Comment était l'attente?",
-      keyWord: 'Attente'
-    }, {
-      text: 'Etait-ce trop bryuant?',
-      keyWord: 'Bruit'
-    }, {
-      text: 'Le prix convenait il?',
-      keyWord: 'Prix'
-    }, {
-      text: "Propreté de la cafeteria",
-      keyWord: 'Propreté'
-    }, {
-      text: "Propreté des sanitaires",
-      keyWord: 'propreté'
-    }]
-  }, {
-    name: 'Bureau',
-    questionList: [{
-      text: "Avez vous été productif aujourd'hui?",
-      keyWord: 'Productivité'
-    }, {
-      text: 'Comment était la température?',
-      keyWord: 'Température'
-    }, {
-      text: 'Etait-ce trop bryuant?',
-      keyWord: 'Bruit'
-    }, {
-      text: 'Votre bureau était il sale?',
-      keyWord: 'Propreté'
-    }, {
-      text: 'Ambiance',
-      keyWord: 'Ambiance'
-    }, {
-      text: 'Le materielle',
-      keyWord: 'Materielle'
-    }]
-  }, {
-    name: 'Espace de repos',
-    questionList: [{
-      text: 'Le lieux était il propre',
-      keyWord: 'Propreté'
-    }, {
-      text: "L'ambiance était elle convenable?",
-      keyWord: 'Ambiance'
-    }, {
-      text: 'Temperature convenable?',
-      keyWord: 'Temperature'
-    }]
-  }]
-};
-var fakeSurvey2 = {
-  name: 'Cours',
-  thematiqueList: [{
-    name: 'Amphithéatre',
-    questionList: [{
-      text: 'Les sièges sont confortable?',
-      keyWord: 'Confort'
-    }, {
-      text: "Le cours était trop long?",
-      keyWord: 'Attente'
-    }, {
-      text: 'Etait-ce trop bryuant?',
-      keyWord: 'Bruit'
-    }, {
-      text: 'Le cours était intéressant?',
-      keyWord: 'Qualité'
-    }, {
-      text: "Propreté de la l'amphithéatre",
-      keyWord: 'Propreté'
-    }, {
-      text: "Propreté des sanitaires",
-      keyWord: 'propreté'
-    }]
-  }, {
-    name: 'Salle de TD',
-    questionList: [{
-      text: 'Le lieux était il propre',
-      keyWord: 'Propreté'
-    }, {
-      text: "L'ambiance était elle convenable?",
-      keyWord: 'Ambiance'
-    }, {
-      text: 'Temperature convenable?',
-      keyWord: 'Temperature'
-    }]
-  }]
-};
-var userList = [{
-  firstName: "Jean",
-  lastName: "Michel",
-  pseudo: "Jean",
-  email: "jean.michel@supukec.fr",
-  password: "michel"
-}, {
-  firstName: "Charles",
-  lastName: "Henry",
-  pseudo: "Charles",
-  email: "charles.henry@supukec.fr",
-  password: "henry"
-}, {
-  firstName: "John",
-  lastName: "Michelangelo",
-  pseudo: "John",
-  email: "john.michelangelo@supukec.fr",
-  password: "michelangelo"
-}, {
-  firstName: "Martin",
-  lastName: "Mystère",
-  pseudo: "Martin",
-  email: "martin.mystere@supukec.fr",
-  password: "mystere"
-}, {
-  firstName: "Bob",
-  lastName: "Laiponje",
-  pseudo: "Bob",
-  email: "bob.laiponje@supukec.fr",
-  password: "laiponje"
-}, {
-  firstName: "Jacques",
-  lastName: "Adi",
-  pseudo: "Jacques",
-  email: "jacques.adi@supukec.fr",
-  password: "adi"
-}, {
-  firstName: "Jean",
-  lastName: "Michel",
-  pseudo: "Jean",
-  email: "jean.michel@supukec.fr",
-  password: "michel"
-}, {
-  firstName: "Goerge",
-  lastName: "Michaels",
-  pseudo: "Goerge",
-  email: "goerge.michaels@supukec.fr",
-  password: "michaels"
-}, {
-  firstName: "Merin",
-  lastName: "Marlin",
-  pseudo: "merin",
-  email: "merin.marlin@supukec.fr",
-  password: "marlin"
-}, {
-  firstName: "Marie",
-  lastName: "Jeanne",
-  pseudo: "Marie",
-  email: "marie.jeanne@supukec.fr",
-  password: "jeanne"
-}, {
-  firstName: "Claire",
-  lastName: "Dejager",
-  pseudo: "Claire",
-  email: "claire.dejager@supukec.fr",
-  password: "dejager"
-}, {
-  firstName: "Anne",
-  lastName: "Collins",
-  pseudo: "Anne",
-  email: "anne.collins@supukec.fr",
-  password: "anne"
-}, {
-  firstName: "Laure",
-  lastName: "Bailleul",
-  pseudo: "laure",
-  email: "laure.bailleul@supukec.fr",
-  password: "bailleul"
-}, {
-  firstName: "Camille",
-  lastName: "Oswald",
-  pseudo: "Camille",
-  email: "camille.oswald@supukec.fr",
-  password: "oswald"
-}];
 
 var rand = function rand(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -245,7 +72,6 @@ var addManyUsers = function addManyUsers(userNumber) {
   });
 };
 
-var fakeSurvey_id = null;
 var questionIdList = {};
 
 var getQuestionIdList = function getQuestionIdList(fakeSurveyId1, fakeSurveyId2) {
@@ -443,18 +269,11 @@ clearTables().then(function () {
   });
 });
 var post_number = 6;
-var fake_post = {
-  title: "Good News !",
-  text: "Et quia Montius inter dilancinantium manus spiritum efflaturus Epigonum et Eusebium nec professionem nec dignitatem ostendens aliquotiens increpabat, qui sint hi magna quaerebatur industria, et nequid intepesceret, Epigonus e Lycia philosophus ducitur et Eusebius ab Emissa Pittacas cognomento, concitatus orator, cum quaestor non hos sed tribunos fabricarum insimulasset promittentes armorum si novas res agitari conperissent.",
-  linkURL: 'https://fr.wikipedia.org/wiki/Vincent_Martin'
-};
 console.log("Adding posts ...");
 var postPromiseArray = [];
-
-for (var index = 0; index < 6; index++) {
+postList.forEach(function (fake_post) {
   postPromiseArray.push(Post.addPost(fake_post));
-}
-
+});
 Promise.all(postPromiseArray).then(function () {
   console.log(post_number, " Posts added");
 });

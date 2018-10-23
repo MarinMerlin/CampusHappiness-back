@@ -59,6 +59,7 @@ router.post('/',
 
 router.get('/check', (req, res) => {
   if (req.isAuthenticated()) {
+    console.log(req.user);
     res.json({
       firstName: req.user.firstName,
       lastName: req.user.lastName,
