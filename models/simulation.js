@@ -3,7 +3,7 @@ const id_generator = require('../custom_module/id_generator');
 const clearTables = require('./setup');
 
 const { 
-  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group, Post,
+  Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group, Post, Commentaire,
 } = Models;
 
 const simulationTime = 35;
@@ -191,6 +191,28 @@ const day = function (numberAddeduser) {
   });
 };
 
+function comments() { 
+  Remplissage.findAll().then((allRemplissages) => {
+    allRemplissages.forEach((remplissage) => {
+      if (Math.random() < 0.4) {
+        Question.findAll({ where: { sondage_id: remplissage.sondage_id } }).then((questionList) => {
+          const thematiqueIdArray = [];
+          questionList.forEach((question) => {
+            if (!thematiqueIdArray.includes(question.thematique_id)) {
+              thematiqueIdArray.push(question.thematique_id);
+            }
+          });
+          const index = Math.round(Math.random() * (thematiqueIdArray.length - 1));
+          const remplissage_id = remplissage.id;
+          const thematique_id = thematiqueIdArray[index];
+          const commentaire = 'faux message';
+          Commentaire.addCommentaire(remplissage_id, thematique_id, commentaire);
+        });
+      }
+    });
+  });
+}
+
 const Alldays = function (compteur) {
   if (compteur === 0) {
     console.log(' -- fin --');
@@ -203,6 +225,7 @@ const Alldays = function (compteur) {
     Reponse.count().then((sum) => {
       console.log("reponses :", sum);
     });
+    comments();
   } else {
     compteur--;
     console.log(compteur);
@@ -218,23 +241,26 @@ const Alldays = function (compteur) {
   }
 };
 
+const ajoutPostes = () => {
+  const post_number = 6;
+
+  console.log("Adding posts ...");
+  const postPromiseArray = [];
+  postList.forEach((fake_post) => {
+    postPromiseArray.push(Post.addPost(fake_post));
+  });
+
+  Promise.all(postPromiseArray).then(() => {
+    console.log(post_number, " Posts added");
+  });
+}; 
+
 clearTables().then(() => {
   console.log("");
   console.log("------------------------------------------");
   console.log("");
   firstDay().then(() => {
     Alldays(simulationTime);
+    ajoutPostes();
   });
-});
-
-const post_number = 6;
-
-console.log("Adding posts ...");
-const postPromiseArray = [];
-postList.forEach((fake_post) => {
-  postPromiseArray.push(Post.addPost(fake_post));
-});
-
-Promise.all(postPromiseArray).then(() => {
-  console.log(post_number, " Posts added");
 });
