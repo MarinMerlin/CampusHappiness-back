@@ -63,8 +63,8 @@ var fakeSurvey2 = {
   thematiqueList: [{
     name: 'Auditorium',
     questionList: [{
-      text: 'Were the seats comfto?',
-      keyWord: 'Comfortable'
+      text: 'Were the seats comfortable?',
+      keyWord: 'Comfort'
     }, {
       text: "Was the class too long?",
       keyWord: 'Wait'

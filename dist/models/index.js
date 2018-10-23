@@ -638,6 +638,7 @@ User.prototype.getUserStat = function () {
   var _this2 = this;
 
   var getDayStatis = function getDayStatis(jour, thematique) {
+    var compteur = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     return new Promise(function (resolve) {
       Reponse.findAll({
         include: [{
@@ -659,8 +660,13 @@ User.prototype.getUserStat = function () {
             satisfaction += rep.dataValues.valeur;
           });
           resolve(parseFloat((satisfaction / reps.length).toFixed(3)));
-        } else {
+        } else if (compteur > 5) {
           resolve(0);
+        } else {
+          console.log("recurssif", reps.length);
+          getDayStatis(jour - 86400000, thematique, compteur + 1).then(function (data) {
+            return resolve(data);
+          });
         }
       });
     });

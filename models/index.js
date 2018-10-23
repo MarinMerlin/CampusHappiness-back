@@ -510,7 +510,7 @@ User.prototype.getStatistics = function (next) {
 };
 
 User.prototype.getUserStat = function () {
-  const getDayStatis = (jour, thematique) => new Promise((resolve) => {
+  const getDayStatis = (jour, thematique, compteur = 0) => new Promise((resolve) => {
     Reponse.findAll({
       include: [{
         model: Remplissage,
@@ -528,8 +528,10 @@ User.prototype.getUserStat = function () {
           satisfaction += rep.dataValues.valeur;
         });
         resolve(parseFloat((satisfaction / reps.length).toFixed(3)));
-      } else {
+      } else if (compteur > 4) {
         resolve(0);
+      } else {
+        getDayStatis(jour - 86400000, thematique, compteur + 1).then(data => resolve(data));
       }
     });
   });

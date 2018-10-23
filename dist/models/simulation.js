@@ -183,8 +183,8 @@ var firstDay = function firstDay() {
     var sondage_id2 = sondageIds[1];
     Sondage.addSondage(sondage_id, 'Admin', Date.now(), fakeSurvey.name).then(function () {
       Sondage.addSondage(sondage_id2, 'Admin', Date.now(), fakeSurvey2.name).then(function () {
-        Group.addGroup(sondage_id, 'Professeurs', groupIds[0]).then(function () {
-          Group.addGroup(sondage_id2, 'Eleves', groupIds[1]).then(function () {
+        Group.addGroup(sondage_id, 'Teachers', groupIds[0]).then(function () {
+          Group.addGroup(sondage_id2, 'Students', groupIds[1]).then(function () {
             User.addUser('Admin', 'Admin', 'admin.admin@gmail.com', 'Admin', 'mdp', 1, groupIds[0]).then(function () {
               addManyUsers(10).then(function () {
                 User.findOne({
@@ -194,15 +194,15 @@ var firstDay = function firstDay() {
                 }).then(function (user) {
                   user.updateSondage(fakeSurvey, sondage_id).then(function () {
                     user.updateSondage(fakeSurvey2, sondage_id2).then(function () {
-                      Keyword.addKeyword("Qualité");
-                      Keyword.addKeyword("Attente");
-                      Keyword.addKeyword("Bruit");
-                      Keyword.addKeyword("Prix");
-                      Keyword.addKeyword("Propreté");
-                      Keyword.addKeyword("Materielle");
-                      Keyword.addKeyword("Ambiance");
-                      Keyword.addKeyword("Température");
-                      Keyword.addKeyword("Confort");
+                      Keyword.addKeyword("Quality");
+                      Keyword.addKeyword("Wait");
+                      Keyword.addKeyword("Noise");
+                      Keyword.addKeyword("Price");
+                      Keyword.addKeyword("Cleanliness");
+                      Keyword.addKeyword("Hardware");
+                      Keyword.addKeyword("Mood");
+                      Keyword.addKeyword("Temperature");
+                      Keyword.addKeyword("Comfort");
                       getQuestionIdList(sondage_id, sondage_id2).then(function () {
                         answerAll().then(function () {
                           incrementDay();

@@ -62,6 +62,7 @@ router.post('/', passport.authenticate('local', {
 
 router.get('/check', function (req, res) {
   if (req.isAuthenticated()) {
+    console.log(req.user);
     res.json({
       firstName: req.user.firstName,
       lastName: req.user.lastName,

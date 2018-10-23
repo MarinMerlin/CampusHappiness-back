@@ -7,7 +7,9 @@ var router = express.Router();
 var fs = require('fs'); // Le body Parser permet d'acceder aux variable envoyés dans le body
 
 
-var bodyParser = require('body-parser');
+var bodyParser = require('body-parser'); //  De base le poid maximum des données est de 100 kb,
+// On conserve cette limite, le front doit vérifier en amont
+
 
 router.use(bodyParser.json());
 router.use(express.urlencoded({
@@ -40,20 +42,39 @@ router.post('/updateUser', function (req, res) {
   });
 });
 router.post('/updatePhoto', function (req, res) {
-  var base64Data = req.body.photo.replace(/^data:image\/jpeg;base64,/, "");
-  fs.writeFile("./public/user/photo/".concat(req.user.pseudo, ".jpg"), base64Data, 'base64', function (err) {
+  var base64Data = req.body.photo.replace(/^data:image\/jpeg;base64,/, ""); // Supression de l'ancienne photo
+
+  Models.User.findById(req.user.id).then(function (user) {
+    if (user.dataValues.photo !== "/user/photo/default.jpg") {
+      fs.unlink("./public".concat(user.dataValues.photo), function (error) {
+        if (error) {
+          console.log("erreur au cours de la supression de la photo, erreur", error);
+        } else {
+          console.log("Photo ".concat(user.dataValues.photo, " supprim\xE9e !"));
+        }
+      });
+    }
+  });
+  var date = Date.now();
+  fs.writeFile("./public/user/photo/".concat(req.user.pseudo, "-").concat(date, ".jpg"), base64Data, 'base64', function (err) {
     if (err) {
       console.log(err);
     } else {
+      var newCookie = Object.assign(req.user, {
+        photo: "/user/photo/".concat(req.user.pseudo, "-").concat(date, ".jpg")
+      });
+      req.login(newCookie, function () {
+        console.log("Modified cookie: ", newCookie);
+      });
       Models.User.update({
-        photo: "/user/photo/".concat(req.user.pseudo, ".jpg")
+        photo: "/user/photo/".concat(req.user.pseudo, "-").concat(date, ".jpg")
       }, {
         where: {
           id: req.user.id
         }
       }).then(function () {
         res.status(200).json({
-          photo: "/user/photo/".concat(req.user.pseudo, ".jpg")
+          photo: "/user/photo/".concat(req.user.pseudo, "-").concat(date, ".jpg")
         });
       });
     }
