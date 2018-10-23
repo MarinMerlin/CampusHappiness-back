@@ -86,9 +86,9 @@ router.get('/userStat', (req, res) => {
     });
   });
 });
- 
+
 router.get("/getPosts", (req, res) => {
-  Models.Post.findAll().then((posts) => {
+  Models.Post.findAll({ order: [['createdAt', 'DESC']] }).then((posts) => {
     res.json(posts);
   });
 });
