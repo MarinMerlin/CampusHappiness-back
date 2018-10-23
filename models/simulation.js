@@ -1,6 +1,7 @@
 const Models = require("./index");
 const id_generator = require('../custom_module/id_generator');
 const clearTables = require('./setup');
+const env = require("../const");
 
 const { 
   Sondage, User, Reponse, Question, Remplissage, JourSondage, Keyword, Group, Post, Commentaire,
@@ -14,7 +15,7 @@ const userList = require('./simulationData/userList');
 const { fakeSurvey, fakeSurvey2 } = require('./simulationData/fakeSurveys');
 const postList = require('./simulationData/postList');
 
-const groupIds = [id_generator(), id_generator()];
+const groupIds = [env.default_group, id_generator()];
 const sondageIds = [id_generator(), id_generator()];
 
 
