@@ -30,7 +30,7 @@ var postConstructor = function postConstructor(sequelize) {
       type: Sequelize.TEXT
     }
   }, {
-    timestamps: false
+    timestamps: true
   });
 
   Post.addPost = function (post) {

@@ -81,6 +81,7 @@ router.get('/getToken', (req, res) => {
     include: [{ model: Models.Group }],
     where: { id: req.user.id }, 
   }).then((user) => {
+    console.log(user.dataValues);
     Models.Sondage.findOne({ where: { id: user.dataValues.group.dataValues.sondage_id } })
       .then((sondage) => {
         Models.Remplissage.findOne(

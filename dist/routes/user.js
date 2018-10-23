@@ -89,6 +89,7 @@ router.get('/getToken', function (req, res) {
       id: req.user.id
     }
   }).then(function (user) {
+    console.log(user.dataValues);
     Models.Sondage.findOne({
       where: {
         id: user.dataValues.group.dataValues.sondage_id
@@ -132,7 +133,9 @@ router.get('/userStat', function (req, res) {
   });
 });
 router.get("/getPosts", function (req, res) {
-  Models.Post.findAll().then(function (posts) {
+  Models.Post.findAll({
+    order: [['createdAt', 'DESC']]
+  }).then(function (posts) {
     res.json(posts);
   });
 });

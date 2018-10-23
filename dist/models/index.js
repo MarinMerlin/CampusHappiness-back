@@ -660,10 +660,9 @@ User.prototype.getUserStat = function () {
             satisfaction += rep.dataValues.valeur;
           });
           resolve(parseFloat((satisfaction / reps.length).toFixed(3)));
-        } else if (compteur > 5) {
+        } else if (compteur > 4) {
           resolve(0);
         } else {
-          console.log("recurssif", reps.length);
           getDayStatis(jour - 86400000, thematique, compteur + 1).then(function (data) {
             return resolve(data);
           });

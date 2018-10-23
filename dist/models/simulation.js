@@ -14,7 +14,8 @@ var Sondage = Models.Sondage,
     JourSondage = Models.JourSondage,
     Keyword = Models.Keyword,
     Group = Models.Group,
-    Post = Models.Post;
+    Post = Models.Post,
+    Commentaire = Models.Commentaire;
 var simulationTime = 35;
 var simulationDay = new Date();
 simulationDay.setDate(simulationDay.getDate() - simulationTime);
@@ -232,6 +233,32 @@ var day = function day(numberAddeduser) {
   });
 };
 
+function comments() {
+  Remplissage.findAll().then(function (allRemplissages) {
+    allRemplissages.forEach(function (remplissage) {
+      if (Math.random() < 0.4) {
+        Question.findAll({
+          where: {
+            sondage_id: remplissage.sondage_id
+          }
+        }).then(function (questionList) {
+          var thematiqueIdArray = [];
+          questionList.forEach(function (question) {
+            if (!thematiqueIdArray.includes(question.thematique_id)) {
+              thematiqueIdArray.push(question.thematique_id);
+            }
+          });
+          var index = Math.round(Math.random() * (thematiqueIdArray.length - 1));
+          var remplissage_id = remplissage.id;
+          var thematique_id = thematiqueIdArray[index];
+          var commentaire = 'faux message';
+          Commentaire.addCommentaire(remplissage_id, thematique_id, commentaire);
+        });
+      }
+    });
+  });
+}
+
 var Alldays = function Alldays(compteur) {
   if (compteur === 0) {
     console.log(' -- fin --');
@@ -244,6 +271,7 @@ var Alldays = function Alldays(compteur) {
     Reponse.count().then(function (sum) {
       console.log("reponses :", sum);
     });
+    comments();
   } else {
     compteur--;
     console.log(compteur);
@@ -260,21 +288,25 @@ var Alldays = function Alldays(compteur) {
   }
 };
 
+var ajoutPostes = function ajoutPostes() {
+  var post_number = 6;
+  console.log("Adding posts ...");
+  var postPromiseArray = [];
+  postList.forEach(function (fake_post) {
+    postPromiseArray.push(Post.addPost(fake_post));
+  });
+  Promise.all(postPromiseArray).then(function () {
+    console.log(post_number, " Posts added");
+  });
+};
+
 clearTables().then(function () {
   console.log("");
   console.log("------------------------------------------");
   console.log("");
   firstDay().then(function () {
     Alldays(simulationTime);
+    ajoutPostes();
   });
-});
-var post_number = 6;
-console.log("Adding posts ...");
-var postPromiseArray = [];
-postList.forEach(function (fake_post) {
-  postPromiseArray.push(Post.addPost(fake_post));
-});
-Promise.all(postPromiseArray).then(function () {
-  console.log(post_number, " Posts added");
 });
 //# sourceMappingURL=simulation.js.map
