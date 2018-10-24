@@ -46,7 +46,9 @@ router.post('/postUsers', function (req, res) {
     promises.push(Models.User.addUser(user.firstName, user.lastName, user.email, user.pseudo, user.password, authValue));
   });
   Promise.all(promises).then(function () {
-    Models.User.findAll().then(function (allUserData) {
+    Models.User.findAll({
+      order: [['createdAt', 'DESC']]
+    }).then(function (allUserData) {
       var userArray = [];
       allUserData.forEach(function (user) {
         var _user$dataValues = user.dataValues,
@@ -73,7 +75,9 @@ router.post('/postUsers', function (req, res) {
   });
 });
 router.get('/getUsers', function (req, res) {
-  Models.User.findAll().then(function (allUserData) {
+  Models.User.findAll({
+    order: [['createdAt', 'DESC']]
+  }).then(function (allUserData) {
     var userArray = [];
     allUserData.forEach(function (user) {
       var _user$dataValues2 = user.dataValues,
@@ -92,14 +96,25 @@ router.get('/getUsers', function (req, res) {
         group_id: group_id
       });
     });
+    console.log(userArray);
     res.json(userArray);
   });
 });
 router.post('/postGroup', function (req, res) {
   Models.Sondage.findOne().then(function (sondage) {
     Models.Group.addGroup(sondage.dataValues.id, req.body.groupName).then(function () {
-      res.status(200).json({
-        success: true
+      Models.User.findOne({
+        where: {
+          id: req.user.id
+        }
+      }).then(function (user) {
+        user.getGroups().then(function (groupList) {
+          console.log("Sent all groups to client");
+          res.status(200).json({
+            success: true,
+            groupList: groupList
+          });
+        });
       });
     });
   });

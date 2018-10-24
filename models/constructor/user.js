@@ -49,7 +49,7 @@ const userConstructor = function (sequelize) {
       type: Sequelize.STRING,
     },
   }, {
-    timestamps: false,
+    timestamps: true,
   });
 
   // Class Methods
@@ -70,7 +70,7 @@ const userConstructor = function (sequelize) {
           photo: '/user/photo/default.jpg',
           mailIntensity: 1,
           group_id: group_id,
-          lastMailDate: Date.now(),
+          lastMailDate: (Date.now() - 86400000),
         }).then((user) => {
           accountCreationMail({
             ...user.dataValues,
