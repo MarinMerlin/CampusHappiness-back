@@ -44,7 +44,7 @@ router.post('/answerSondage',
           };
           user.updateAnswer(sondage).then(() => {
             console.log(req.user.firstName, " already answered and changed his answers");
-            res.status(200).send({ msg: "Merci d'avoir modifier votre reponse !" });
+            res.status(200).send({ msg: "Survey sucessfully modified" });
           });
         });
       } else {
@@ -57,7 +57,7 @@ router.post('/answerSondage',
           };
           user.answerSondage(sondage).then(() => {
             console.log("New remplissage submitted by: ", req.user.firstName);
-            res.status(200).send({ msg: "Merci d'avoir repondu au sondage !" });
+            res.status(200).send({ msg: "Survey successfully submitted !" });
           });
         });
       }
@@ -82,7 +82,7 @@ router.get('/getMailIntensity',
     });
   });
 
-router.use((err, req, res, next) => {
+router.use((err, req, res) => {
   console.log("error: ", err.name);
   if (err.name === 'UnauthorizedError') {
     res.status(401).json({ message: 'Unauthorized. Invalid token!' });
