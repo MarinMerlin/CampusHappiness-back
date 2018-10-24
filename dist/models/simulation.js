@@ -6,6 +6,8 @@ var id_generator = require('../custom_module/id_generator');
 
 var clearTables = require('./setup');
 
+var env = require("../const");
+
 var Sondage = Models.Sondage,
     User = Models.User,
     Reponse = Models.Reponse,
@@ -28,7 +30,7 @@ var _require = require('./simulationData/fakeSurveys'),
 
 var postList = require('./simulationData/postList');
 
-var groupIds = [id_generator(), id_generator()];
+var groupIds = [env.default_group, id_generator()];
 var sondageIds = [id_generator(), id_generator()];
 
 var rand = function rand(max) {

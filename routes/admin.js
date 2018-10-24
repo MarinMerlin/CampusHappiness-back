@@ -48,7 +48,7 @@ router.post('/postUsers',
       ));
     });
     Promise.all(promises).then(() => {
-      Models.User.findAll().then((allUserData) => {
+      Models.User.findAll({ order: [['createdAt', 'DESC']] }).then((allUserData) => {
         const userArray = [];
         allUserData.forEach((user) => {
           const {
@@ -69,7 +69,7 @@ router.post('/postUsers',
   });
 
 router.get('/getUsers', (req, res) => {
-  Models.User.findAll().then((allUserData) => {
+  Models.User.findAll({ order: [['createdAt', 'DESC']] }).then((allUserData) => {
     const userArray = [];
     allUserData.forEach((user) => {
       const {
@@ -84,6 +84,7 @@ router.get('/getUsers', (req, res) => {
         group_id: group_id,
       });
     });
+    console.log(userArray);
     res.json(userArray);
   });
 });
@@ -91,7 +92,12 @@ router.get('/getUsers', (req, res) => {
 router.post('/postGroup', (req, res) => {
   Models.Sondage.findOne().then((sondage) => {
     Models.Group.addGroup(sondage.dataValues.id, req.body.groupName).then(() => {
-      res.status(200).json({ success: true });
+      Models.User.findOne({ where: { id: req.user.id } }).then((user) => {
+        user.getGroups().then((groupList) => {
+          console.log("Sent all groups to client");
+          res.status(200).json({ success: true, groupList: groupList });
+        });
+      });
     });
   });
 });

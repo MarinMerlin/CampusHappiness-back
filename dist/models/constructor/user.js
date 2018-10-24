@@ -60,7 +60,7 @@ var userConstructor = function userConstructor(sequelize) {
       type: Sequelize.STRING
     }
   }, {
-    timestamps: false
+    timestamps: true
   }); // Class Methods
 
   User.addUser = function (firstName, lastName, email, pseudo, password, auth) {
@@ -81,7 +81,7 @@ var userConstructor = function userConstructor(sequelize) {
           photo: '/user/photo/default.jpg',
           mailIntensity: 1,
           group_id: group_id,
-          lastMailDate: Date.now()
+          lastMailDate: Date.now() - 86400000
         }).then(function (user) {
           accountCreationMail(_objectSpread({}, user.dataValues, {
             password: password
