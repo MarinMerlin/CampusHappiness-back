@@ -89,7 +89,6 @@ router.get('/getToken', function (req, res) {
       id: req.user.id
     }
   }).then(function (user) {
-    console.log(user.dataValues);
     Models.Sondage.findOne({
       where: {
         id: user.dataValues.group.dataValues.sondage_id

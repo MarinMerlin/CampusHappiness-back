@@ -14,6 +14,7 @@ simulationDay.setDate(simulationDay.getDate() - simulationTime);
 const userList = require('./simulationData/userList');
 const { fakeSurvey, fakeSurvey2 } = require('./simulationData/fakeSurveys');
 const postList = require('./simulationData/postList');
+const commentText = require('./simulationData/fakeComments');
 
 const groupIds = [env.default_group, id_generator()];
 const sondageIds = [id_generator(), id_generator()];
@@ -206,7 +207,8 @@ function comments() {
           const index = Math.round(Math.random() * (thematiqueIdArray.length - 1));
           const remplissage_id = remplissage.id;
           const thematique_id = thematiqueIdArray[index];
-          const commentaire = 'faux message';
+          const commentNumber = commentText.length;
+          const commentaire = commentText[Math.floor(Math.random() * Math.floor(commentNumber))];
           Commentaire.addCommentaire(remplissage_id, thematique_id, commentaire);
         });
       }
